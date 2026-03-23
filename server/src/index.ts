@@ -2,6 +2,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 
 import authRoutes from './routes/auth';
 import userRoutes from './routes/user';
@@ -27,6 +28,11 @@ app.use('/action', actionRoutes);
 app.use('/loan', loanRoutes);
 app.use('/invest', investRoutes);
 app.use('/message', messageRoutes);
+
+app.use(express.static(path.join(__dirname, '../../client/dist')));
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+});
 
 app.listen(PORT, () => {
   console.log(`PocketBank server running on port ${PORT}`);

@@ -46,3 +46,13 @@
 - No CSS framework — plain CSS modules to keep the Pi footprint small
 - `readOnly` prop on LoanPanel and InvestPanel — parent can view but not act on a child's account
 - Family ID shown on parent dashboard so parents can share it with their children for registration
+
+---
+
+## Step 4 — Single-Process Deployment (Express Serves React)
+**What:** Wired Express to serve the React build as static files. Added a root `package.json` with `build` and `start` scripts.
+**Why:** On the Raspberry Pi only one process should run. Instead of running Express and a separate static file server, Express itself serves `client/dist` — the compiled React app.
+
+**Changes:**
+- `server/src/index.ts` — added `path` import; added `express.static` and catch-all `index.html` route after all API routes
+- `package.json` (root) — created with `build` (builds client then server) and `start` (runs server) scripts
