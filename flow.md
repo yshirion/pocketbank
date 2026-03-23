@@ -56,3 +56,13 @@
 **Changes:**
 - `server/src/index.ts` — added `path` import; added `express.static` and catch-all `index.html` route after all API routes
 - `package.json` (root) — created with `build` (builds client then server) and `start` (runs server) scripts
+
+---
+
+## Step 5 — Raspberry Pi Deployment
+**What:** Created `setup.sh` (one-command setup script) and `DEPLOY.md` (Pi deployment guide).
+**Why:** The Pi needs a simple, reproducible way to go from a fresh `git clone` to a running app without manual steps.
+
+**Changes:**
+- `setup.sh` — auto-creates `server/.env` with a generated `JWT_SECRET`, installs deps, migrates DB, builds client + server
+- `DEPLOY.md` — covers prerequisites, first-time setup, updating, and systemd auto-start on boot
