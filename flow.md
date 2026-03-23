@@ -15,3 +15,16 @@
 - Frontend: React + TypeScript
 - DB: SQLite + Prisma ORM
 - Auth: JWT + bcrypt
+
+---
+
+## Step 2 — Server Foundation
+**What:** Built the complete server layer: package.json, tsconfig, Prisma schema (SQLite, 6 models), Express app wired to 7 route files, 7 controller files, and JWT auth middleware.
+**Why:** Establishing the full server skeleton with real logic so the client can be built against a working API in the next step.
+
+**Key decisions:**
+- Passwords hashed with bcrypt (10 rounds) — fixes plaintext storage from original
+- Auth via POST body, not URL — fixes credential exposure from original
+- JWT in httpOnly cookie, 7-day expiry — fixes no-session issue from original
+- Prisma transactions used for all multi-table writes (action + balance + loan/invest) — ensures consistency
+- `compound()` helper: `PV × (1 + r/100)^months` — preserves original interest formula exactly

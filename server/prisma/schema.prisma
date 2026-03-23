@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Family {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  loanInterest        Float  @default(0.1)
+  investLongInterest  Float  @default(0.1)
+  investShortInterest Float  @default(0.1)
+  users               User[]
+}
+
+model User {
+  id        Int     @id @default(autoincrement())
+  familyId  Int
+  firstName String
+  lastName  String
+  username  String  @unique
+  password  String
+  isParent  Boolean @default(false)
+  balance   Float   @default(0)
+
+  family    Family    @relation(fields: [familyId], references: [id])
+  actions   Action[]
+  loans     Loan[]
+  invests   Invest[]
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+}
+
+model Action {
+  id       Int      @id @default(autoincrement())
+  userId   Int
+  positive Boolean
+  type     String
+  amount   Float
+  start    DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+}
+
+model Loan {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  amount        Float
+  currentAmount Float
+  interest      Float
+  start         DateTime @default(now())
+  updatedAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id])
+}
+
+model Invest {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  amount        Float
+  currentAmount Float
+  interest      Float
+  longTerm      Boolean
+  start         DateTime @default(now())
+  end           DateTime
+  updatedAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  senderId    Int
+  receiverId  Int
+  senderName  String
+  content     String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+}
