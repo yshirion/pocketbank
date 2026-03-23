@@ -28,3 +28,21 @@
 - JWT in httpOnly cookie, 7-day expiry — fixes no-session issue from original
 - Prisma transactions used for all multi-table writes (action + balance + loan/invest) — ensures consistency
 - `compound()` helper: `PV × (1 + r/100)^months` — preserves original interest formula exactly
+
+---
+
+## Step 3 — React Client
+**What:** Built the complete React + TypeScript client using Vite. Includes all pages, components, auth context, and API service layer.
+**Why:** The server is now fully functional; the client gives it a usable interface that runs in any browser on the local network.
+
+**Files created:**
+- `vite.config.ts` — proxies `/api/*` to `localhost:8080` to avoid CORS issues in dev
+- `context/AuthContext.tsx` — replaces the Android `CalcKidsApplication` singleton; holds current user and "viewing child" state
+- `services/api.ts` — all Axios calls in one place; uses `withCredentials` so the JWT cookie is sent automatically
+- `pages/` — Login, RegisterParent, RegisterChild, ParentDashboard, ChildDashboard
+- `components/` — BalanceCard, ActionList, LoanPanel, InvestPanel, MessagePanel
+
+**Key decisions:**
+- No CSS framework — plain CSS modules to keep the Pi footprint small
+- `readOnly` prop on LoanPanel and InvestPanel — parent can view but not act on a child's account
+- Family ID shown on parent dashboard so parents can share it with their children for registration

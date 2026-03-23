@@ -1,0 +1,171 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: #2b6cb0;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  flex: 1;
+}
+
+.headerActions {
+  margin-left: auto;
+}
+
+.logoutBtn {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 6px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.logoutBtn:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.main {
+  padding: 1.25rem;
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #2d3748;
+}
+
+.empty {
+  color: #a0aec0;
+  font-size: 0.9rem;
+}
+
+.childList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.childItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.childItem:last-child {
+  border-bottom: none;
+}
+
+.childName {
+  flex: 1;
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #2b6cb0;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.childName:hover {
+  text-decoration: underline;
+}
+
+.childBalance {
+  font-size: 0.85rem;
+  color: #38a169;
+  font-weight: 600;
+}
+
+.childActions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.promoteBtn {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  background: #ebf8ff;
+  color: #2b6cb0;
+  border: 1px solid #bee3f8;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.deleteBtn {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  background: #fff5f5;
+  color: #e53e3e;
+  border: 1px solid #fed7d7;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.editBtn {
+  margin-top: 0.75rem;
+  padding: 0.4rem 0.9rem;
+  background: #2b6cb0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.interestForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+}
+
+.interestForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  color: #4a5568;
+}
+
+.interestForm input {
+  padding: 0.45rem 0.7rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
