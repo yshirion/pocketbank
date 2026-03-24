@@ -79,10 +79,16 @@
 
 .childItem {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  flex-direction: column;
   padding: 0.5rem 0;
   border-bottom: 1px solid #edf2f7;
+  gap: 0.5rem;
+}
+
+.childRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .childItem:last-child {
@@ -168,4 +174,48 @@
   border: 1px solid #cbd5e0;
   border-radius: 8px;
   font-size: 0.9rem;
+}
+
+.moneyForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.moneyToggle {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.moneyInput {
+  padding: 0.4rem 0.7rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.activePos {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.85rem;
+  background: #c6f6d5;
+  color: #276749;
+  border: 1px solid #9ae6b4;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.activeNeg {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.85rem;
+  background: #fed7d7;
+  color: #9b2c2c;
+  border: 1px solid #fc8181;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
 }

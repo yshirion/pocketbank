@@ -66,3 +66,13 @@
 **Changes:**
 - `setup.sh` — auto-creates `server/.env` with a generated `JWT_SECRET`, installs deps, migrates DB, builds client + server
 - `DEPLOY.md` — covers prerequisites, first-time setup, updating, and systemd auto-start on boot
+
+---
+
+## Step 6 — Add Money to Child (Parent Dashboard)
+**What:** Added an "Add Money" inline form per child on the Parent Dashboard.
+**Why:** Parents had no way to credit or debit a child's balance from the UI. The server API already supported it; only the UI was missing.
+
+**Changes:**
+- `ParentDashboard.tsx` — "Add Money" button per child; inline form with amount, description, and +/− toggle; calls `createAction` on save
+- `Dashboard.module.css` — added `.moneyForm`, `.moneyToggle`, `.moneyInput`, `.activePos`, `.activeNeg`, `.childRow` styles

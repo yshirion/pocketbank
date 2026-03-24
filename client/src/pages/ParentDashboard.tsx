@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, User } from '../context/AuthContext';
-import { getFamilyChildren, getFamily, updateInterests, promoteToParent, deleteUser, logout } from '../services/api';
+import { getFamilyChildren, getFamily, updateInterests, promoteToParent, deleteUser, logout, createAction } from '../services/api';
 import MessagePanel from '../components/MessagePanel';
 import styles from './Dashboard.module.css';
 
@@ -20,6 +20,8 @@ export default function ParentDashboard() {
   const [family, setFamily] = useState<Family | null>(null);
   const [editingInterests, setEditingInterests] = useState(false);
   const [interests, setInterests] = useState({ loanInterest: 0, investLongInterest: 0, investShortInterest: 0 });
+  const [addMoneyChildId, setAddMoneyChildId] = useState<number | null>(null);
+  const [moneyForm, setMoneyForm] = useState({ amount: '', type: '', positive: true });
 
   async function load() {
     const [childRes, familyRes] = await Promise.all([
@@ -56,6 +58,15 @@ export default function ParentDashboard() {
     await load();
   }
 
+  async function handleAddMoney(childId: number) {
+    const amount = parseFloat(moneyForm.amount);
+    if (!amount || amount <= 0 || !moneyForm.type.trim()) return;
+    await createAction({ userId: childId, positive: moneyForm.positive, type: moneyForm.type.trim(), amount });
+    setAddMoneyChildId(null);
+    setMoneyForm({ amount: '', type: '', positive: true });
+    await load();
+  }
+
   async function handleLogout() {
     await logout();
     setUser(null);
@@ -77,14 +88,31 @@ export default function ParentDashboard() {
           <ul className={styles.childList}>
             {children.map((child) => (
               <li key={child.id} className={styles.childItem}>
+                <div className={styles.childRow}>
                 <button className={styles.childName} onClick={() => viewChild(child)}>
                   {child.firstName} {child.lastName}
                   <span className={styles.childBalance}>₪{child.balance.toFixed(2)}</span>
                 </button>
                 <div className={styles.childActions}>
+                  <button className={styles.editBtn} onClick={() => { setAddMoneyChildId(child.id); setMoneyForm({ amount: '', type: '', positive: true }); }}>Add Money</button>
                   <button className={styles.promoteBtn} onClick={() => handlePromote(child.id)}>Make Parent</button>
                   <button className={styles.deleteBtn} onClick={() => handleDelete(child.id)}>Delete</button>
                 </div>
+                </div>
+                {addMoneyChildId === child.id && (
+                  <div className={styles.moneyForm}>
+                    <div className={styles.moneyToggle}>
+                      <button className={moneyForm.positive ? styles.activePos : styles.editBtn} onClick={() => setMoneyForm((f) => ({ ...f, positive: true }))}>+ Income</button>
+                      <button className={!moneyForm.positive ? styles.activeNeg : styles.deleteBtn} onClick={() => setMoneyForm((f) => ({ ...f, positive: false }))}>− Expense</button>
+                    </div>
+                    <input className={styles.moneyInput} type="number" min="0" step="0.01" placeholder="Amount (₪)" value={moneyForm.amount} onChange={(e) => setMoneyForm((f) => ({ ...f, amount: e.target.value }))} />
+                    <input className={styles.moneyInput} type="text" placeholder="Description (e.g. Allowance)" value={moneyForm.type} onChange={(e) => setMoneyForm((f) => ({ ...f, type: e.target.value }))} />
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button className={styles.editBtn} onClick={() => handleAddMoney(child.id)}>Save</button>
+                      <button className={styles.deleteBtn} onClick={() => setAddMoneyChildId(null)}>Cancel</button>
+                    </div>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
