@@ -43,7 +43,7 @@ export default function ChildDashboard() {
         <BalanceCard balance={child.balance} name={`${child.firstName} ${child.lastName}`} />
         <LoanPanel userId={child.id} readOnly={isParentViewing} />
         <InvestPanel userId={child.id} readOnly={isParentViewing} />
-        <MessagePanel userId={child.id} receiverId={user!.id} />
+        <MessagePanel userId={child.id} familyId={child.familyId} isParent={false} readOnly={isParentViewing} />
         <ActionList userId={child.id} />
       </main>
     </div>

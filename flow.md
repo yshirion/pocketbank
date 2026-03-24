@@ -69,6 +69,24 @@
 
 ---
 
+## Step 7A — Unified Button Sizes
+**What:** Standardized all buttons to the same size across all CSS files.
+**Why:** Buttons had inconsistent padding and font sizes; only color should differ by role.
+
+**Changes:** `Dashboard.module.css`, `Panel.module.css` — all buttons now use `padding: 0.4rem 0.85rem`, `font-size: 0.875rem`, `font-weight: 600`, `border-radius: 8px`.
+
+---
+
+## Step 7B — Fix Messaging (Recipient Selection)
+**What:** Fixed messaging so parent can send to a specific child, and child can send to a parent. Previously all messages were sent to self.
+**Why:** `MessagePanel` had a hardcoded `receiverId` that pointed to the wrong user in all cases.
+
+**Changes:**
+- `MessagePanel.tsx` — removed `receiverId` prop; added `familyId`, `isParent`, `readOnly` props; fetches recipients dynamically (parents for children, children for parents); shows a dropdown when multiple recipients exist; hides send form when `readOnly`
+- `ParentDashboard.tsx`, `ChildDashboard.tsx` — updated `MessagePanel` call with correct props
+
+---
+
 ## Step 6 — Add Money to Child (Parent Dashboard)
 **What:** Added an "Add Money" inline form per child on the Parent Dashboard.
 **Why:** Parents had no way to credit or debit a child's balance from the UI. The server API already supported it; only the UI was missing.

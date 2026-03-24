@@ -1,5 +1,5 @@
 import { useEffect, useState, FormEvent } from 'react';
-import { getInbox, getSent, sendMessage, markRead } from '../services/api';
+import { getInbox, getSent, sendMessage, markRead, getFamilyChildren, getFamilyParents } from '../services/api';
 import styles from './Panel.module.css';
 
 interface Message {
@@ -10,11 +10,29 @@ interface Message {
   createdAt: string;
 }
 
-export default function MessagePanel({ userId, receiverId }: { userId: number; receiverId: number }) {
+interface Recipient {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+
+export default function MessagePanel({
+  userId,
+  familyId,
+  isParent,
+  readOnly = false,
+}: {
+  userId: number;
+  familyId: number;
+  isParent: boolean;
+  readOnly?: boolean;
+}) {
   const [inbox, setInbox] = useState<Message[]>([]);
   const [sent, setSent] = useState<Message[]>([]);
   const [tab, setTab] = useState<'inbox' | 'sent'>('inbox');
   const [content, setContent] = useState('');
+  const [recipients, setRecipients] = useState<Recipient[]>([]);
+  const [recipientId, setRecipientId] = useState<number | null>(null);
   const [error, setError] = useState('');
 
   async function load() {
@@ -26,13 +44,26 @@ export default function MessagePanel({ userId, receiverId }: { userId: number; r
     if (unread.length > 0) await markRead(unread);
   }
 
-  useEffect(() => { load(); }, [userId]);
+  useEffect(() => {
+    load();
+  }, [userId]);
+
+  useEffect(() => {
+    if (readOnly) return;
+    const fetcher = isParent ? getFamilyChildren : getFamilyParents;
+    fetcher(familyId).then((r) => {
+      const list = r.data as Recipient[];
+      setRecipients(list);
+      if (list.length > 0) setRecipientId(list[0].id);
+    });
+  }, [familyId, isParent, readOnly]);
 
   async function handleSend(e: FormEvent) {
     e.preventDefault();
     setError('');
+    if (!recipientId) { setError('No recipient available.'); return; }
     try {
-      await sendMessage({ receiverId, content });
+      await sendMessage({ receiverId: recipientId, content });
       setContent('');
       await load();
     } catch {
@@ -41,13 +72,14 @@ export default function MessagePanel({ userId, receiverId }: { userId: number; r
   }
 
   const messages = tab === 'inbox' ? inbox : sent;
+  const unreadCount = inbox.filter((m) => !m.isRead).length;
 
   return (
     <div className={styles.panel}>
       <h2 className={styles.heading}>Messages</h2>
       <div className={styles.row}>
         <button className={tab === 'inbox' ? styles.btn : styles.btnDanger} onClick={() => setTab('inbox')}>
-          Inbox {inbox.filter((m) => !m.isRead).length > 0 && `(${inbox.filter((m) => !m.isRead).length})`}
+          Inbox{unreadCount > 0 ? ` (${unreadCount})` : ''}
         </button>
         <button className={tab === 'sent' ? styles.btn : styles.btnDanger} onClick={() => setTab('sent')}>Sent</button>
       </div>
@@ -61,11 +93,36 @@ export default function MessagePanel({ userId, receiverId }: { userId: number; r
           </li>
         ))}
       </ul>
-      <form onSubmit={handleSend} className={styles.row} style={{ marginTop: '1rem' }}>
-        <input className={styles.input} placeholder="Write a message..." value={content} onChange={(e) => setContent(e.target.value)} required />
-        <button className={styles.btn} type="submit">Send</button>
-      </form>
-      {error && <p className={styles.error}>{error}</p>}
+      {!readOnly && (
+        <form onSubmit={handleSend} style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {recipients.length > 1 && (
+            <select
+              className={styles.input}
+              value={recipientId ?? ''}
+              onChange={(e) => setRecipientId(Number(e.target.value))}
+            >
+              {recipients.map((r) => (
+                <option key={r.id} value={r.id}>{r.firstName} {r.lastName}</option>
+              ))}
+            </select>
+          )}
+          {recipients.length === 1 && (
+            <p style={{ fontSize: '0.85rem', color: '#718096' }}>
+              To: <strong>{recipients[0].firstName} {recipients[0].lastName}</strong>
+            </p>
+          )}
+          {recipients.length === 0 && (
+            <p className={styles.empty}>No one to message yet.</p>
+          )}
+          {recipients.length > 0 && (
+            <div className={styles.row}>
+              <input className={styles.input} placeholder="Write a message..." value={content} onChange={(e) => setContent(e.target.value)} required />
+              <button className={styles.btn} type="submit">Send</button>
+            </div>
+          )}
+          {error && <p className={styles.error}>{error}</p>}
+        </form>
+      )}
     </div>
   );
 }

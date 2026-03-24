@@ -146,7 +146,7 @@ export default function ParentDashboard() {
           )}
         </div>
 
-        <MessagePanel userId={user!.id} receiverId={user!.id} />
+        <MessagePanel userId={user!.id} familyId={user!.familyId} isParent={true} />
       </main>
     </div>
   );
