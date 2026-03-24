@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getMe } from '../services/api';
+import { getMe, logout as logoutApi } from '../services/api';
+
+const INACTIVITY_MS = 10 * 60 * 1000; // 10 minutes
 
 export interface User {
   id: number;
@@ -32,6 +34,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
+
+  // Inactivity timer: logout after 10 minutes with no user interaction
+  useEffect(() => {
+    if (!user) return;
+
+    let timer: ReturnType<typeof setTimeout>;
+
+    function reset() {
+      clearTimeout(timer);
+      timer = setTimeout(async () => {
+        try { await logoutApi(); } catch { /* ignore */ }
+        setUser(null);
+      }, INACTIVITY_MS);
+    }
+
+    const events = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart'] as const;
+    events.forEach((e) => window.addEventListener(e, reset, { passive: true }));
+    reset();
+
+    return () => {
+      clearTimeout(timer);
+      events.forEach((e) => window.removeEventListener(e, reset));
+    };
+  }, [user?.id]);
 
   return (
     <AuthContext.Provider value={{ user, viewingChild, setUser, setViewingChild, loading }}>

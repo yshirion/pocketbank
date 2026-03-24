@@ -87,6 +87,21 @@
 
 ---
 
+## Step 7C — Auto Logout (Inactivity + Session Cookie)
+**What:** Users are logged out after 10 minutes of inactivity or when they close the tab.
+**Why:** Standard security practice for a financial app — prevents leaving an open session unattended.
+
+**How it works:**
+- Session cookie (no `maxAge`): browser deletes the cookie automatically when the tab/window closes
+- JWT expiry reduced from 7 days to 12 hours as a server-side safety net
+- Inactivity timer in `AuthContext`: resets on any mouse/keyboard/scroll/touch event; after 10 minutes of silence it calls `logout()` and sets `user` to null, which the router catches and redirects to `/login`
+
+**Changes:**
+- `auth.controller.ts` — removed `maxAge` from cookie; changed JWT `expiresIn` from `7d` to `12h`
+- `AuthContext.tsx` — added 10-minute inactivity timer with activity event listeners
+
+---
+
 ## Step 6 — Add Money to Child (Parent Dashboard)
 **What:** Added an "Add Money" inline form per child on the Parent Dashboard.
 **Why:** Parents had no way to credit or debit a child's balance from the UI. The server API already supported it; only the UI was missing.
