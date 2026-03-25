@@ -95,7 +95,7 @@ export default function MessagePanel({
       </ul>
       {!readOnly && (
         <form onSubmit={handleSend} style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          {recipients.length > 1 && (
+          {recipients.length > 0 && (
             <select
               className={styles.input}
               value={recipientId ?? ''}
@@ -105,11 +105,6 @@ export default function MessagePanel({
                 <option key={r.id} value={r.id}>{r.firstName} {r.lastName}</option>
               ))}
             </select>
-          )}
-          {recipients.length === 1 && (
-            <p style={{ fontSize: '0.85rem', color: '#718096' }}>
-              To: <strong>{recipients[0].firstName} {recipients[0].lastName}</strong>
-            </p>
           )}
           {recipients.length === 0 && (
             <p className={styles.empty}>No one to message yet.</p>
