@@ -54,7 +54,7 @@ export default function MessagePanel({
     fetcher(familyId).then((r) => {
       const list = r.data as Recipient[];
       setRecipients(list);
-      if (list.length > 0) setRecipientId(list[0].id);
+      setRecipientId(null);
     });
   }, [familyId, isParent, readOnly]);
 
@@ -101,6 +101,7 @@ export default function MessagePanel({
               value={recipientId ?? ''}
               onChange={(e) => setRecipientId(Number(e.target.value))}
             >
+              <option value="" disabled>— Choose recipient —</option>
               {recipients.map((r) => (
                 <option key={r.id} value={r.id}>{r.firstName} {r.lastName}</option>
               ))}
@@ -112,7 +113,7 @@ export default function MessagePanel({
           {recipients.length > 0 && (
             <div className={styles.row}>
               <input className={styles.input} placeholder="Write a message..." value={content} onChange={(e) => setContent(e.target.value)} required />
-              <button className={styles.btn} type="submit">Send</button>
+              <button className={styles.btn} type="submit" disabled={!recipientId}>Send</button>
             </div>
           )}
           {error && <p className={styles.error}>{error}</p>}
