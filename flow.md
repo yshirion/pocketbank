@@ -123,6 +123,33 @@
 
 ---
 
+## Step 10 — Mobile-First Redesign
+**What:** Complete redesign of both dashboards optimized for phone browsers, with expandable cards and a responsive chat layout.
+**Why:** The main use case is a phone browser; the previous layout had flat lists and non-collapsible panels that did not work well on small screens.
+
+**Parent screen:**
+- Children rendered as tappable cards (name + balance); tap the card body to navigate to the child's screen
+- "Add Money" button inline on each card; expands a form inside the card
+
+**Child screen:**
+- Three expandable summary cards: Balance (tap to see transaction history, expenses in red, income in green), Loans (tap to request/repay; parent can give loans), Investments (tap to invest short/long; parent can release)
+- When parent is viewing a child: "Remove Child" and "Make Parent" action bar appears below the header
+- Chat: bottom of screen on mobile, sticky right sidebar on desktop (≥768 px)
+
+**Promote-to-parent now clears data:** Server deletes all actions, loans, and investments for the child and resets balance to 0 before setting `isParent: true` — all in a single Prisma transaction.
+
+**Changes:**
+- `server/src/controllers/user.controller.ts` — `promoteToParent` now clears child data in a transaction
+- `client/src/components/BalanceCard.tsx` + `BalanceCard.module.css` — rewritten as expandable blue-header card with lazy-loaded transaction list
+- `client/src/components/LoanPanel.tsx` — rewritten as expandable card; `isParent` prop switches between "Give Loan" (parent) and "Request Loan" + "Repay" (child)
+- `client/src/components/InvestPanel.tsx` — rewritten as expandable card; `isParent` shows per-item "Release" buttons instead of the invest form
+- `client/src/components/Panel.module.css` — added expandable card CSS classes
+- `client/src/pages/ParentDashboard.tsx` — children rendered as cards; promote/delete moved to child screen
+- `client/src/pages/ChildDashboard.tsx` — expandable layout with responsive sidebar; parent action bar with remove/promote buttons
+- `client/src/pages/Dashboard.module.css` — added child card, parent action bar, and responsive layout styles
+
+---
+
 ## Step 6 — Add Money to Child (Parent Dashboard)
 **What:** Added an "Add Money" inline form per child on the Parent Dashboard.
 **Why:** Parents had no way to credit or debit a child's balance from the UI. The server API already supported it; only the UI was missing.

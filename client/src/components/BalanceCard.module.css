@@ -1,24 +1,135 @@
 .card {
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+.header {
   background: #2b6cb0;
   color: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  text-align: left;
+  gap: 0.5rem;
+}
+
+.header:active {
+  background: #2c5282;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
 }
 
 .name {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
 }
 
 .label {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .amount {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 700;
-  margin-top: 0.25rem;
+  margin: 0;
+}
+
+.chevron {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+.chevronOpen {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  display: inline-block;
+  transform: rotate(180deg);
+  transition: transform 0.2s;
+}
+
+.body {
+  background: white;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.empty {
+  color: #a0aec0;
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.type {
+  flex: 1;
+  text-transform: capitalize;
+  color: #4a5568;
+}
+
+.positive {
+  font-weight: 600;
+  color: #38a169;
+  min-width: 80px;
+  text-align: right;
+}
+
+.negative {
+  font-weight: 600;
+  color: #e53e3e;
+  min-width: 80px;
+  text-align: right;
+}
+
+.date {
+  color: #a0aec0;
+  font-size: 0.78rem;
+  min-width: 65px;
+  text-align: right;
 }

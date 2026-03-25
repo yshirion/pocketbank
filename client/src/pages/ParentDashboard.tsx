@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, User } from '../context/AuthContext';
-import { getFamilyChildren, getFamily, updateInterests, promoteToParent, deleteUser, logout, createAction } from '../services/api';
+import { getFamilyChildren, getFamily, updateInterests, logout, createAction } from '../services/api';
 import MessagingHub from '../components/MessagingHub';
 import styles from './Dashboard.module.css';
 
@@ -42,17 +42,6 @@ export default function ParentDashboard() {
     navigate('/child');
   }
 
-  async function handlePromote(id: number) {
-    await promoteToParent(id);
-    await load();
-  }
-
-  async function handleDelete(id: number) {
-    if (!confirm('Delete this child?')) return;
-    await deleteUser(id);
-    await load();
-  }
-
   async function handleSaveInterests() {
     await updateInterests(user!.familyId, interests);
     setEditingInterests(false);
@@ -89,37 +78,36 @@ export default function ParentDashboard() {
         <div className={styles.card}>
           <h2 className={styles.sectionTitle}>Children</h2>
           {children.length === 0 && <p className={styles.empty}>No children yet. Share your Family ID with them.</p>}
-          <ul className={styles.childList}>
-            {children.map((child) => (
-              <li key={child.id} className={styles.childItem}>
-                <div className={styles.childRow}>
-                <button className={styles.childName} onClick={() => viewChild(child)}>
-                  {child.firstName} {child.lastName}
-                  <span className={styles.childBalance}>₪{child.balance.toFixed(2)}</span>
+          {children.map((child) => (
+            <div key={child.id} className={styles.childCard}>
+              <div className={styles.childCardNav} onClick={() => viewChild(child)}>
+                <span className={styles.childCardName}>{child.firstName} {child.lastName}</span>
+                <span className={styles.childCardBalance}>₪{child.balance.toFixed(2)}</span>
+              </div>
+              <div className={styles.childCardFooter}>
+                <button
+                  className={styles.addMoneyBtn}
+                  onClick={() => {
+                    setAddMoneyChildId(addMoneyChildId === child.id ? null : child.id);
+                    setMoneyForm({ amount: '', type: '', positive: true });
+                  }}
+                >
+                  {addMoneyChildId === child.id ? 'Cancel' : '+ Add Money'}
                 </button>
-                <div className={styles.childActions}>
-                  <button className={styles.editBtn} onClick={() => { setAddMoneyChildId(child.id); setMoneyForm({ amount: '', type: '', positive: true }); }}>Add Money</button>
-                  <button className={styles.promoteBtn} onClick={() => handlePromote(child.id)}>Make Parent</button>
-                  <button className={styles.deleteBtn} onClick={() => handleDelete(child.id)}>Delete</button>
-                </div>
-                </div>
-                {addMoneyChildId === child.id && (
-                  <div className={styles.moneyForm}>
-                    <div className={styles.moneyToggle}>
-                      <button className={moneyForm.positive ? styles.activePos : styles.editBtn} onClick={() => setMoneyForm((f) => ({ ...f, positive: true }))}>+ Income</button>
-                      <button className={!moneyForm.positive ? styles.activeNeg : styles.deleteBtn} onClick={() => setMoneyForm((f) => ({ ...f, positive: false }))}>− Expense</button>
-                    </div>
-                    <input className={styles.moneyInput} type="number" min="0" step="0.01" placeholder="Amount (₪)" value={moneyForm.amount} onChange={(e) => setMoneyForm((f) => ({ ...f, amount: e.target.value }))} />
-                    <input className={styles.moneyInput} type="text" placeholder="Description (e.g. Allowance)" value={moneyForm.type} onChange={(e) => setMoneyForm((f) => ({ ...f, type: e.target.value }))} />
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button className={styles.editBtn} onClick={() => handleAddMoney(child.id)}>Save</button>
-                      <button className={styles.deleteBtn} onClick={() => setAddMoneyChildId(null)}>Cancel</button>
-                    </div>
+              </div>
+              {addMoneyChildId === child.id && (
+                <div className={styles.moneyForm}>
+                  <div className={styles.moneyToggle}>
+                    <button className={moneyForm.positive ? styles.activePos : styles.editBtn} onClick={() => setMoneyForm((f) => ({ ...f, positive: true }))}>+ Income</button>
+                    <button className={!moneyForm.positive ? styles.activeNeg : styles.deleteBtn} onClick={() => setMoneyForm((f) => ({ ...f, positive: false }))}>− Expense</button>
                   </div>
-                )}
-              </li>
-            ))}
-          </ul>
+                  <input className={styles.moneyInput} type="number" min="0" step="0.01" placeholder="Amount (₪)" value={moneyForm.amount} onChange={(e) => setMoneyForm((f) => ({ ...f, amount: e.target.value }))} />
+                  <input className={styles.moneyInput} type="text" placeholder="Description (e.g. Allowance)" value={moneyForm.type} onChange={(e) => setMoneyForm((f) => ({ ...f, type: e.target.value }))} />
+                  <button className={styles.editBtn} onClick={() => handleAddMoney(child.id)}>Save</button>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
 
         <div className={styles.card}>

@@ -139,3 +139,80 @@
   border-radius: 4px;
   padding: 0.1rem 0.4rem;
 }
+
+/* ── Expandable card ── */
+.expandCard {
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+.expandHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 0.5rem;
+}
+
+.expandHeader:active {
+  background: #f7fafc;
+}
+
+.expandTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.expandRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.expandTotal {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #a0aec0;
+}
+
+.expandTotalNeg {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e53e3e;
+}
+
+.expandTotalPos {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #276749;
+}
+
+.chevron {
+  font-size: 0.75rem;
+  color: #a0aec0;
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+.chevronOpen {
+  font-size: 0.75rem;
+  color: #a0aec0;
+  display: inline-block;
+  transform: rotate(180deg);
+  transition: transform 0.2s;
+}
+
+.expandBody {
+  border-top: 1px solid #edf2f7;
+  padding: 1rem 1.25rem;
+}

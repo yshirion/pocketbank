@@ -28,7 +28,13 @@ export async function getFamilyParents(req: AuthRequest, res: Response): Promise
 }
 
 export async function promoteToParent(req: AuthRequest, res: Response): Promise<void> {
-  await prisma.user.update({ where: { id: Number(req.params.id) }, data: { isParent: true } });
+  const id = Number(req.params.id);
+  await prisma.$transaction([
+    prisma.action.deleteMany({ where: { userId: id } }),
+    prisma.loan.deleteMany({ where: { userId: id } }),
+    prisma.invest.deleteMany({ where: { userId: id } }),
+    prisma.user.update({ where: { id }, data: { isParent: true, balance: 0 } }),
+  ]);
   res.json({ message: 'User promoted to parent' });
 }
 

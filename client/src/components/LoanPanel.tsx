@@ -10,7 +10,14 @@ interface Loan {
   start: string;
 }
 
-export default function LoanPanel({ userId, readOnly }: { userId: number; readOnly?: boolean }) {
+interface Props {
+  userId: number;
+  isParent?: boolean;
+  onAction?: () => void;
+}
+
+export default function LoanPanel({ userId, isParent, onAction }: Props) {
+  const [open, setOpen] = useState(false);
   const [loans, setLoans] = useState<Loan[]>([]);
   const [amount, setAmount] = useState('');
   const [selected, setSelected] = useState<number[]>([]);
@@ -21,7 +28,13 @@ export default function LoanPanel({ userId, readOnly }: { userId: number; readOn
     setLoans(r.data as Loan[]);
   }
 
-  useEffect(() => { load(); }, [userId]);
+  useEffect(() => {
+    load();
+    setOpen(false);
+    setSelected([]);
+  }, [userId]);
+
+  const total = loans.reduce((s, l) => s + l.currentAmount, 0);
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault();
@@ -30,9 +43,10 @@ export default function LoanPanel({ userId, readOnly }: { userId: number; readOn
       await createLoan({ userId, amount: Number(amount) });
       setAmount('');
       await load();
+      onAction?.();
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
-      setError(msg ?? 'Failed to create loan.');
+      setError(msg ?? 'Failed.');
     }
   }
 
@@ -42,9 +56,10 @@ export default function LoanPanel({ userId, readOnly }: { userId: number; readOn
       await repayLoans(selected);
       setSelected([]);
       await load();
+      onAction?.();
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
-      setError(msg ?? 'Failed to repay loans.');
+      setError(msg ?? 'Failed to repay.');
     }
   }
 
@@ -53,31 +68,62 @@ export default function LoanPanel({ userId, readOnly }: { userId: number; readOn
   }
 
   return (
-    <div className={styles.panel}>
-      <h2 className={styles.heading}>Loans</h2>
-      {!readOnly && (
-        <form onSubmit={handleCreate} className={styles.row}>
-          <input className={styles.input} type="number" min="1" placeholder="Amount" value={amount} onChange={(e) => setAmount(e.target.value)} required />
-          <button className={styles.btn} type="submit">Take Loan</button>
-        </form>
-      )}
-      {error && <p className={styles.error}>{error}</p>}
-      {loans.length === 0 && <p className={styles.empty}>No active loans.</p>}
-      <ul className={styles.list}>
-        {loans.map((l) => (
-          <li key={l.id} className={styles.item}>
-            {!readOnly && (
-              <input className={styles.checkbox} type="checkbox" checked={selected.includes(l.id)} onChange={() => toggle(l.id)} />
-            )}
-            <span className={styles.type}>Loan</span>
-            <span className={styles.tag}>{l.interest}%/mo</span>
-            <span className={styles.negative}>₪{l.currentAmount.toFixed(2)}</span>
-            <span className={styles.date}>{new Date(l.start).toLocaleDateString()}</span>
-          </li>
-        ))}
-      </ul>
-      {!readOnly && selected.length > 0 && (
-        <button className={styles.btnDanger} onClick={handleRepay}>Repay Selected</button>
+    <div className={styles.expandCard}>
+      <button className={styles.expandHeader} onClick={() => setOpen((o) => !o)}>
+        <span className={styles.expandTitle}>Loans</span>
+        <div className={styles.expandRight}>
+          <span className={loans.length === 0 ? styles.expandTotal : styles.expandTotalNeg}>
+            {loans.length === 0 ? 'None' : `₪${total.toFixed(2)}`}
+          </span>
+          <span className={open ? styles.chevronOpen : styles.chevron}>▼</span>
+        </div>
+      </button>
+      {open && (
+        <div className={styles.expandBody}>
+          <form onSubmit={handleCreate} className={styles.row}>
+            <input
+              className={styles.input}
+              type="number"
+              min="1"
+              placeholder="Amount (₪)"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              required
+            />
+            <button className={styles.btn} type="submit">
+              {isParent ? 'Give Loan' : 'Request Loan'}
+            </button>
+          </form>
+          {error && <p className={styles.error}>{error}</p>}
+          {loans.length === 0
+            ? <p className={styles.empty}>No active loans.</p>
+            : (
+              <ul className={styles.list}>
+                {loans.map((l) => (
+                  <li key={l.id} className={styles.item}>
+                    {!isParent && (
+                      <input
+                        className={styles.checkbox}
+                        type="checkbox"
+                        checked={selected.includes(l.id)}
+                        onChange={() => toggle(l.id)}
+                      />
+                    )}
+                    <span className={styles.type}>Loan</span>
+                    <span className={styles.tag}>{l.interest}%/mo</span>
+                    <span className={styles.negative}>₪{l.currentAmount.toFixed(2)}</span>
+                    <span className={styles.date}>{new Date(l.start).toLocaleDateString()}</span>
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+          {!isParent && selected.length > 0 && (
+            <button className={styles.btnDanger} style={{ marginTop: '0.5rem' }} onClick={handleRepay}>
+              Repay Selected
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

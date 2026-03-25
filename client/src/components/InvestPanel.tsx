@@ -12,12 +12,18 @@ interface Invest {
   end: string;
 }
 
-export default function InvestPanel({ userId, readOnly }: { userId: number; readOnly?: boolean }) {
+interface Props {
+  userId: number;
+  isParent?: boolean;
+  onAction?: () => void;
+}
+
+export default function InvestPanel({ userId, isParent, onAction }: Props) {
+  const [open, setOpen] = useState(false);
   const [invests, setInvests] = useState<Invest[]>([]);
   const [amount, setAmount] = useState('');
   const [longTerm, setLongTerm] = useState(false);
   const [end, setEnd] = useState('');
-  const [selected, setSelected] = useState<number[]>([]);
   const [error, setError] = useState('');
 
   async function load() {
@@ -25,7 +31,12 @@ export default function InvestPanel({ userId, readOnly }: { userId: number; read
     setInvests(r.data as Invest[]);
   }
 
-  useEffect(() => { load(); }, [userId]);
+  useEffect(() => {
+    load();
+    setOpen(false);
+  }, [userId]);
+
+  const total = invests.reduce((s, i) => s + i.currentAmount, 0);
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault();
@@ -35,59 +46,85 @@ export default function InvestPanel({ userId, readOnly }: { userId: number; read
       setAmount('');
       setEnd('');
       await load();
+      onAction?.();
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
-      setError(msg ?? 'Failed to create investment.');
+      setError(msg ?? 'Failed to invest.');
     }
   }
 
-  async function handleWithdraw() {
+  async function handleRelease(id: number) {
     setError('');
     try {
-      await withdrawInvests(selected);
-      setSelected([]);
+      await withdrawInvests([id]);
       await load();
+      onAction?.();
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
-      setError(msg ?? 'Failed to withdraw.');
+      setError(msg ?? 'Failed to release.');
     }
-  }
-
-  function toggle(id: number) {
-    setSelected((s) => s.includes(id) ? s.filter((x) => x !== id) : [...s, id]);
   }
 
   return (
-    <div className={styles.panel}>
-      <h2 className={styles.heading}>Investments</h2>
-      {!readOnly && (
-        <form onSubmit={handleCreate} className={styles.row}>
-          <input className={styles.input} type="number" min="1" placeholder="Amount" value={amount} onChange={(e) => setAmount(e.target.value)} required />
-          <input className={styles.input} type="date" value={end} onChange={(e) => setEnd(e.target.value)} required />
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.9rem' }}>
-            <input type="checkbox" checked={longTerm} onChange={(e) => setLongTerm(e.target.checked)} />
-            Long-term
-          </label>
-          <button className={styles.btn} type="submit">Invest</button>
-        </form>
-      )}
-      {error && <p className={styles.error}>{error}</p>}
-      {invests.length === 0 && <p className={styles.empty}>No active investments.</p>}
-      <ul className={styles.list}>
-        {invests.map((inv) => (
-          <li key={inv.id} className={styles.item}>
-            {!readOnly && (
-              <input className={styles.checkbox} type="checkbox" checked={selected.includes(inv.id)} onChange={() => toggle(inv.id)} />
-            )}
-            <span className={styles.type}>{inv.longTerm ? 'Long-term' : 'Short-term'}</span>
-            <span className={styles.tag}>{inv.interest}%/mo</span>
-            <span className={styles.positive}>₪{inv.currentAmount.toFixed(2)}</span>
-            <span className={styles.date}>until {new Date(inv.end).toLocaleDateString()}</span>
-          </li>
-        ))}
-      </ul>
-      {!readOnly && selected.length > 0 && (
-        <button className={styles.btn} onClick={handleWithdraw}>Withdraw Selected</button>
+    <div className={styles.expandCard}>
+      <button className={styles.expandHeader} onClick={() => setOpen((o) => !o)}>
+        <span className={styles.expandTitle}>Investments</span>
+        <div className={styles.expandRight}>
+          <span className={invests.length === 0 ? styles.expandTotal : styles.expandTotalPos}>
+            {invests.length === 0 ? 'None' : `₪${total.toFixed(2)}`}
+          </span>
+          <span className={open ? styles.chevronOpen : styles.chevron}>▼</span>
+        </div>
+      </button>
+      {open && (
+        <div className={styles.expandBody}>
+          {!isParent && (
+            <form onSubmit={handleCreate} className={styles.row}>
+              <input
+                className={styles.input}
+                type="number"
+                min="1"
+                placeholder="Amount (₪)"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                required
+              />
+              <input
+                className={styles.input}
+                type="date"
+                value={end}
+                onChange={(e) => setEnd(e.target.value)}
+                required
+              />
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.875rem', color: '#4a5568' }}>
+                <input type="checkbox" checked={longTerm} onChange={(e) => setLongTerm(e.target.checked)} />
+                Long-term
+              </label>
+              <button className={styles.btn} type="submit">Invest</button>
+            </form>
+          )}
+          {error && <p className={styles.error}>{error}</p>}
+          {invests.length === 0
+            ? <p className={styles.empty}>No active investments.</p>
+            : (
+              <ul className={styles.list}>
+                {invests.map((inv) => (
+                  <li key={inv.id} className={styles.item}>
+                    <span className={styles.type}>{inv.longTerm ? 'Long-term' : 'Short-term'}</span>
+                    <span className={styles.tag}>{inv.interest}%/mo</span>
+                    <span className={styles.positive}>₪{inv.currentAmount.toFixed(2)}</span>
+                    <span className={styles.date}>until {new Date(inv.end).toLocaleDateString()}</span>
+                    {isParent && (
+                      <button className={styles.btnSmall} onClick={() => handleRelease(inv.id)}>
+                        Release
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+        </div>
       )}
     </div>
   );

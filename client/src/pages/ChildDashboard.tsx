@@ -1,9 +1,8 @@
-import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
-import { logout } from '../services/api';
+import { useAuth, User } from '../context/AuthContext';
+import { logout, getMe, getFamilyChildren, promoteToParent, deleteUser } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import BalanceCard from '../components/BalanceCard';
-import ActionList from '../components/ActionList';
 import LoanPanel from '../components/LoanPanel';
 import InvestPanel from '../components/InvestPanel';
 import MessagingHub from '../components/MessagingHub';
@@ -16,6 +15,20 @@ export default function ChildDashboard() {
 
   const child = viewingChild ?? user!;
   const isParentViewing = viewingChild !== null;
+  const [balance, setBalance] = useState(child.balance);
+
+  async function refreshBalance() {
+    if (!isParentViewing) {
+      const res = await getMe();
+      const fresh = res.data as User;
+      setUser(fresh);
+      setBalance(fresh.balance);
+    } else {
+      const res = await getFamilyChildren(user!.familyId);
+      const fresh = (res.data as User[]).find((c) => c.id === child.id);
+      if (fresh) setBalance(fresh.balance);
+    }
+  }
 
   async function handleLogout() {
     await logout();
@@ -25,6 +38,20 @@ export default function ChildDashboard() {
   }
 
   function handleBack() {
+    setViewingChild(null);
+    navigate('/parent');
+  }
+
+  async function handleRemove() {
+    if (!confirm(`Delete ${child.firstName}? This cannot be undone.`)) return;
+    await deleteUser(child.id);
+    setViewingChild(null);
+    navigate('/parent');
+  }
+
+  async function handlePromote() {
+    if (!confirm(`Promote ${child.firstName} to parent? All their balance, loans, and investments will be deleted.`)) return;
+    await promoteToParent(child.id);
     setViewingChild(null);
     navigate('/parent');
   }
@@ -48,15 +75,25 @@ export default function ChildDashboard() {
         </div>
       </header>
 
-      <main className={styles.main}>
-        <BalanceCard balance={child.balance} name={`${child.firstName} ${child.lastName}`} />
-        <LoanPanel userId={child.id} readOnly={isParentViewing} />
-        <InvestPanel userId={child.id} readOnly={isParentViewing} />
+      {isParentViewing && (
+        <div className={styles.parentActionBar}>
+          <button className={styles.dangerBtn} onClick={handleRemove}>Remove Child</button>
+          <button className={styles.warnBtn} onClick={handlePromote}>Make Parent</button>
+        </div>
+      )}
+
+      <div className={isParentViewing ? styles.childLayout : styles.childLayoutWithChat}>
+        <div className={styles.childCards}>
+          <BalanceCard userId={child.id} balance={balance} name={`${child.firstName} ${child.lastName}`} />
+          <LoanPanel userId={child.id} isParent={isParentViewing} onAction={refreshBalance} />
+          <InvestPanel userId={child.id} isParent={isParentViewing} onAction={refreshBalance} />
+        </div>
         {!isParentViewing && (
-          <MessagingHub userId={child.id} familyId={child.familyId} isParent={false} onUnreadChange={setTotalUnread} />
+          <div className={styles.childSidebar}>
+            <MessagingHub userId={child.id} familyId={child.familyId} isParent={false} onUnreadChange={setTotalUnread} />
+          </div>
         )}
-        <ActionList userId={child.id} />
-      </main>
+      </div>
     </div>
   );
 }
