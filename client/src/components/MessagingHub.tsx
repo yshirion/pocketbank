@@ -109,26 +109,8 @@ export default function MessagingHub({
 
   return (
     <div className={styles.hub}>
-      {/* Left: contact list */}
-      <div className={styles.contacts}>
-        <div className={styles.contactsTitle}>Messages</div>
-        {contacts.length === 0 && <p className={styles.empty}>No contacts yet.</p>}
-        {contacts.map((c) => (
-          <button
-            key={c.id}
-            className={`${styles.contact} ${selectedId === c.id ? styles.contactActive : ''}`}
-            onClick={() => setSelectedId(c.id)}
-          >
-            <span className={styles.contactName}>{c.firstName} {c.lastName}</span>
-            {(unreadCounts[c.id] ?? 0) > 0 && (
-              <span className={styles.badge}>{unreadCounts[c.id]}</span>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Right: chat */}
       <div className={styles.chat}>
+        <div className={styles.chatTitle}>Messages</div>
         {selectedContact ? (
           <>
             <div className={styles.messages}>

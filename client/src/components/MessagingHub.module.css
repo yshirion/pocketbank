@@ -1,6 +1,7 @@
 .hub {
   display: flex;
-  height: 440px;
+  flex-direction: column;
+  height: 480px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -8,74 +9,22 @@
   margin-bottom: 1rem;
 }
 
-/* ── Left panel: contacts ── */
-.contacts {
-  width: 175px;
-  flex-shrink: 0;
-  border-right: 1px solid #e2e8f0;
+/* ── Chat panel ── */
+.chat {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
-.contactsTitle {
+.chatTitle {
   font-size: 0.875rem;
   font-weight: 700;
   color: #2d3748;
   padding: 0.85rem 1rem;
   border-bottom: 1px solid #e2e8f0;
   background: #f7fafc;
-}
-
-.contact {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.7rem 1rem;
-  background: none;
-  border: none;
-  border-bottom: 1px solid #f7fafc;
-  cursor: pointer;
-  text-align: left;
-  transition: background 0.1s;
-}
-
-.contact:hover {
-  background: #f7fafc;
-}
-
-.contactActive {
-  background: #ebf8ff;
-  border-left: 3px solid #2b6cb0;
-}
-
-.contactName {
-  font-size: 0.875rem;
-  color: #2d3748;
-  font-weight: 500;
-}
-
-.badge {
-  background: #e53e3e;
-  color: white;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  min-width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 4px;
   flex-shrink: 0;
-}
-
-/* ── Right panel: chat ── */
-.chat {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
 }
 
 .messages {
@@ -111,7 +60,7 @@
 }
 
 .bubble {
-  max-width: 65%;
+  max-width: 72%;
   padding: 0.5rem 0.75rem;
   border-radius: 12px;
   display: flex;
@@ -129,7 +78,6 @@
   border-bottom-right-radius: 3px;
 }
 
-/* Unread messages get a yellow highlight */
 .unread {
   border: 2px solid #f6e05e;
   box-shadow: 0 0 0 1px #f6e05e44;
@@ -155,6 +103,7 @@
   gap: 0.5rem;
   padding: 0.65rem 0.75rem;
   border-top: 1px solid #e2e8f0;
+  background: white;
 }
 
 .input {

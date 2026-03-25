@@ -162,6 +162,16 @@
 
 ---
 
+## Step 14 — Remove Contacts Sidebar from MessagingHub
+**What:** Removed the contacts list panel from MessagingHub; chat is now full-width with only a "Messages" title.
+**Why:** The contacts panel was redundant — in this app's context (parent viewing one child, or child with one parent) only one contact exists. The name header above the chat was also removed.
+
+**Changes:**
+- `MessagingHub.tsx` — removed contacts `<div>` from JSX; added `chatTitle` div; kept contacts loading for auto-select
+- `MessagingHub.module.css` — removed all contacts/sidebar CSS; added `.chatTitle`; made `.hub` single-column; chat background `#edf2f7`
+
+---
+
 ## Step 13 — Messaging Polish + Layout Fixes
 **What:** Removed chat contact-name header; added chat background and date separators in Israel time; removed "Children" title on parent screen; narrowed desktop layout.
 **Why:** The contact name header was redundant (already visible in the contacts list). Chat needed visual separation. Times were showing in wrong timezone.
