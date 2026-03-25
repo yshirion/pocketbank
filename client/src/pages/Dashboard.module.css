@@ -353,7 +353,7 @@
 
 @media (min-width: 768px) {
   .childSidebar {
-    width: 360px;
+    width: 300px;
     flex-shrink: 0;
     position: sticky;
     top: 1rem;

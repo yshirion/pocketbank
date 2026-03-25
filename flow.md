@@ -162,6 +162,15 @@
 
 ---
 
+## Step 11 — Sidebar Width Fix (Cards as Main Area)
+**What:** Reduced the chat sidebar from 360px to 300px on desktop.
+**Why:** At small desktop widths (~800px), the 360px sidebar was nearly as wide as the cards column, making the chat look like the main content. Cards should always dominate.
+
+**Changes:**
+- `Dashboard.module.css` — `.childSidebar` desktop width changed from `360px` to `300px`
+
+---
+
 ## Step 6 — Add Money to Child (Parent Dashboard)
 **What:** Added an "Add Money" inline form per child on the Parent Dashboard.
 **Why:** Parents had no way to credit or debit a child's balance from the UI. The server API already supported it; only the UI was missing.
