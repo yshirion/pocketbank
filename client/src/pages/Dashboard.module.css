@@ -244,11 +244,12 @@
 
 .childCardNav {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  text-align: center;
   padding: 1rem 1.25rem;
   cursor: pointer;
-  gap: 1rem;
+  gap: 0.25rem;
 }
 
 .childCardNav:active {

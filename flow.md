@@ -162,6 +162,16 @@
 
 ---
 
+## Step 12 — Center Child Name + Local Network Access
+**What:** Centered the child's name in the parent-screen child cards; exposed Vite dev server on the local network.
+**Why:** Name was left-aligned with balance on the right. Network access allows testing on a phone browser (same Wi-Fi).
+
+**Changes:**
+- `Dashboard.module.css` — `.childCardNav` changed from row `space-between` to column `center`
+- `vite.config.ts` — added `host: true` so Vite listens on `0.0.0.0`; phone accesses via `http://172.20.10.2:5173`
+
+---
+
 ## Step 11 — Sidebar Width Fix (Cards as Main Area)
 **What:** Reduced the chat sidebar from 360px to 300px on desktop.
 **Why:** At small desktop widths (~800px), the 360px sidebar was nearly as wide as the cards column, making the chat look like the main content. Cards should always dominate.
