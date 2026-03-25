@@ -61,16 +61,12 @@ export default function ChildDashboard() {
       <header className={styles.header}>
         <span className={styles.logo}>PocketBank</span>
         <div className={styles.headerActions}>
+          {totalUnread > 0 && (
+            <span className={styles.unreadBadge}>{totalUnread} new {totalUnread === 1 ? 'message' : 'messages'}</span>
+          )}
           {isParentViewing
             ? <button className={styles.logoutBtn} onClick={handleBack}>← Back to family</button>
-            : (
-              <>
-                {totalUnread > 0 && (
-                  <span className={styles.unreadBadge}>{totalUnread} new {totalUnread === 1 ? 'message' : 'messages'}</span>
-                )}
-                <button className={styles.logoutBtn} onClick={handleLogout}>Logout</button>
-              </>
-            )
+            : <button className={styles.logoutBtn} onClick={handleLogout}>Logout</button>
           }
         </div>
       </header>
@@ -82,17 +78,18 @@ export default function ChildDashboard() {
         </div>
       )}
 
-      <div className={isParentViewing ? styles.childLayout : styles.childLayoutWithChat}>
+      <div className={styles.childLayoutWithChat}>
         <div className={styles.childCards}>
           <BalanceCard userId={child.id} balance={balance} name={`${child.firstName} ${child.lastName}`} />
           <LoanPanel userId={child.id} isParent={isParentViewing} onAction={refreshBalance} />
           <InvestPanel userId={child.id} isParent={isParentViewing} onAction={refreshBalance} />
         </div>
-        {!isParentViewing && (
-          <div className={styles.childSidebar}>
-            <MessagingHub userId={child.id} familyId={child.familyId} isParent={false} onUnreadChange={setTotalUnread} />
-          </div>
-        )}
+        <div className={styles.childSidebar}>
+          {isParentViewing
+            ? <MessagingHub userId={user!.id} familyId={user!.familyId} isParent={true} onUnreadChange={setTotalUnread} />
+            : <MessagingHub userId={child.id} familyId={child.familyId} isParent={false} onUnreadChange={setTotalUnread} />
+          }
+        </div>
       </div>
     </div>
   );

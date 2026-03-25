@@ -39,14 +39,10 @@ export default function BalanceCard({ userId, balance, name }: Props) {
   return (
     <div className={styles.card}>
       <button className={styles.header} onClick={() => setOpen((o) => !o)}>
-        <div className={styles.headerLeft}>
-          <p className={styles.name}>{name}</p>
-          <p className={styles.label}>Balance</p>
-        </div>
-        <div className={styles.headerRight}>
-          <p className={styles.amount}>₪{balance.toFixed(2)}</p>
-          <span className={open ? styles.chevronOpen : styles.chevron}>▼</span>
-        </div>
+        <p className={styles.name}>{name}</p>
+        <p className={styles.label}>Balance</p>
+        <p className={styles.amount}>₪{balance.toFixed(2)}</p>
+        <span className={open ? styles.chevronOpen : styles.chevron}>▼</span>
       </button>
       {open && (
         <div className={styles.body}>

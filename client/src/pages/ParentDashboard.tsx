@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, User } from '../context/AuthContext';
 import { getFamilyChildren, getFamily, updateInterests, logout, createAction } from '../services/api';
-import MessagingHub from '../components/MessagingHub';
 import styles from './Dashboard.module.css';
 
 interface Family {
@@ -18,7 +17,6 @@ export default function ParentDashboard() {
   const navigate = useNavigate();
   const [children, setChildren] = useState<User[]>([]);
   const [family, setFamily] = useState<Family | null>(null);
-  const [totalUnread, setTotalUnread] = useState(0);
   const [editingInterests, setEditingInterests] = useState(false);
   const [interests, setInterests] = useState({ loanInterest: 0, investLongInterest: 0, investShortInterest: 0 });
   const [addMoneyChildId, setAddMoneyChildId] = useState<number | null>(null);
@@ -68,9 +66,6 @@ export default function ParentDashboard() {
       <header className={styles.header}>
         <span className={styles.logo}>PocketBank</span>
         <span className={styles.subtitle}>Family: {family?.name} (ID: {user?.familyId})</span>
-        {totalUnread > 0 && (
-          <span className={styles.unreadBadge}>{totalUnread} new {totalUnread === 1 ? 'message' : 'messages'}</span>
-        )}
         <button className={styles.logoutBtn} onClick={handleLogout}>Logout</button>
       </header>
 
@@ -138,7 +133,6 @@ export default function ParentDashboard() {
           )}
         </div>
 
-        <MessagingHub userId={user!.id} familyId={user!.familyId} isParent={true} onUnreadChange={setTotalUnread} />
       </main>
     </div>
   );

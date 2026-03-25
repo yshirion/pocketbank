@@ -123,6 +123,18 @@
 
 ---
 
+## Step 10B — Center Name + Messaging Fix
+**What:** Centered the child's name in the BalanceCard header; moved the chat from the parent dashboard to the child screen only.
+**Why:** Name was left-aligned, which looked off on mobile. Chat was shown on the parent's own dashboard, but the correct UX is to access it only from the child screen (parent sees their own perspective there).
+
+**Changes:**
+- `BalanceCard.module.css` — header changed to column/center layout; chevron absolutely positioned at the right edge
+- `BalanceCard.tsx` — removed wrapper divs; name, label, amount stacked and centered
+- `ParentDashboard.tsx` — removed `MessagingHub`, `totalUnread` state, and unread badge
+- `ChildDashboard.tsx` — `MessagingHub` always visible (both for child's own view and parent's view); parent view uses `userId={user!.id}` + `isParent={true}`; unread badge shown for both viewing modes
+
+---
+
 ## Step 10 — Mobile-First Redesign
 **What:** Complete redesign of both dashboards optimized for phone browsers, with expandable cards and a responsive chat layout.
 **Why:** The main use case is a phone browser; the previous layout had flat lists and non-collapsible panels that did not work well on small screens.
