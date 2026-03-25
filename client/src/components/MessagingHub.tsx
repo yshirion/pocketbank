@@ -54,14 +54,12 @@ export default function MessagingHub({
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [conversation, setConversation] = useState<Message[]>([]);
-  const [unreadCounts, setUnreadCounts] = useState<Record<number, number>>({});
   const [draft, setDraft] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
 
   async function loadUnread() {
     const res = await getUnreadCounts();
     const counts = res.data as Record<number, number>;
-    setUnreadCounts(counts);
     const total = Object.values(counts).reduce((a, b) => a + b, 0);
     onUnreadChange?.(total);
   }
