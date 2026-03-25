@@ -43,3 +43,35 @@ export async function markRead(req: AuthRequest, res: Response): Promise<void> {
   await prisma.message.updateMany({ where: { id: { in: ids } }, data: { isRead: true } });
   res.json({ message: 'Marked as read' });
 }
+
+export async function getConversation(req: AuthRequest, res: Response): Promise<void> {
+  const myId = req.userId!;
+  const otherId = Number(req.params.otherUserId);
+
+  const messages = await prisma.message.findMany({
+    where: {
+      OR: [
+        { senderId: myId, receiverId: otherId },
+        { senderId: otherId, receiverId: myId },
+      ],
+    },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  res.json(messages);
+}
+
+export async function getUnreadCounts(req: AuthRequest, res: Response): Promise<void> {
+  const myId = req.userId!;
+
+  const rows = await prisma.message.groupBy({
+    by: ['senderId'],
+    where: { receiverId: myId, isRead: false },
+    _count: { id: true },
+  });
+
+  const counts: Record<number, number> = {};
+  for (const row of rows) counts[row.senderId] = row._count.id;
+
+  res.json(counts);
+}

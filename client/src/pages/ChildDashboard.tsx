@@ -1,16 +1,18 @@
 import { useAuth } from '../context/AuthContext';
+import { useState } from 'react';
 import { logout } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import BalanceCard from '../components/BalanceCard';
 import ActionList from '../components/ActionList';
 import LoanPanel from '../components/LoanPanel';
 import InvestPanel from '../components/InvestPanel';
-import MessagePanel from '../components/MessagePanel';
+import MessagingHub from '../components/MessagingHub';
 import styles from './Dashboard.module.css';
 
 export default function ChildDashboard() {
   const { user, viewingChild, setUser, setViewingChild } = useAuth();
   const navigate = useNavigate();
+  const [totalUnread, setTotalUnread] = useState(0);
 
   const child = viewingChild ?? user!;
   const isParentViewing = viewingChild !== null;
@@ -34,7 +36,14 @@ export default function ChildDashboard() {
         <div className={styles.headerActions}>
           {isParentViewing
             ? <button className={styles.logoutBtn} onClick={handleBack}>← Back to family</button>
-            : <button className={styles.logoutBtn} onClick={handleLogout}>Logout</button>
+            : (
+              <>
+                {totalUnread > 0 && (
+                  <span className={styles.unreadBadge}>{totalUnread} new {totalUnread === 1 ? 'message' : 'messages'}</span>
+                )}
+                <button className={styles.logoutBtn} onClick={handleLogout}>Logout</button>
+              </>
+            )
           }
         </div>
       </header>
@@ -43,7 +52,9 @@ export default function ChildDashboard() {
         <BalanceCard balance={child.balance} name={`${child.firstName} ${child.lastName}`} />
         <LoanPanel userId={child.id} readOnly={isParentViewing} />
         <InvestPanel userId={child.id} readOnly={isParentViewing} />
-        <MessagePanel userId={child.id} familyId={child.familyId} isParent={false} readOnly={isParentViewing} />
+        {!isParentViewing && (
+          <MessagingHub userId={child.id} familyId={child.familyId} isParent={false} onUnreadChange={setTotalUnread} />
+        )}
         <ActionList userId={child.id} />
       </main>
     </div>

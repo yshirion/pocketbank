@@ -102,6 +102,27 @@
 
 ---
 
+## Step 9 — WhatsApp-Style Messaging Hub
+**What:** Replaced the basic `MessagePanel` with a full two-panel chat interface.
+**Why:** The old panel had no conversation view, no visual distinction between senders, and no unread indicators.
+
+**How it works:**
+- Left panel: contact list with red unread count badge per contact
+- Right panel: chat bubbles — my messages left/gray, theirs right/green, unread theirs get yellow border
+- Opening a conversation marks their messages as read automatically
+- Header badge shows total unread count across all conversations
+- When parent views a child's dashboard, messaging is hidden (parent sends from their own dashboard)
+
+**Changes:**
+- `message.controller.ts` — added `getConversation` (messages between two users) and `getUnreadCounts` (unread count per sender)
+- `routes/message.ts` — added two new routes
+- `api.ts` — added `getConversation`, `getUnreadCounts`
+- New `MessagingHub.tsx` + `MessagingHub.module.css`
+- `ParentDashboard.tsx`, `ChildDashboard.tsx` — swapped `MessagePanel` for `MessagingHub`, added header unread badge
+- `Dashboard.module.css` — added `.unreadBadge` style
+
+---
+
 ## Step 6 — Add Money to Child (Parent Dashboard)
 **What:** Added an "Add Money" inline form per child on the Parent Dashboard.
 **Why:** Parents had no way to credit or debit a child's balance from the UI. The server API already supported it; only the UI was missing.
