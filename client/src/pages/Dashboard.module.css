@@ -11,6 +11,17 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  position: relative;
+}
+
+.headerName {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .logo {
@@ -340,12 +351,22 @@
     margin: 0 auto;
     padding: 1.25rem;
     align-items: flex-start;
+    justify-content: center;
   }
+}
+
+.childSectionName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2d3748;
+  text-align: center;
+  margin-bottom: 0.5rem;
 }
 
 .childCards {
   flex: 1;
   min-width: 0;
+  max-width: 480px;
 }
 
 .childSidebar {

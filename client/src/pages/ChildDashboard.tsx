@@ -60,6 +60,7 @@ export default function ChildDashboard() {
     <div className={styles.page}>
       <header className={styles.header}>
         <span className={styles.logo}>PocketBank</span>
+        <span className={styles.headerName}>{user?.firstName} {user?.lastName}</span>
         <div className={styles.headerActions}>
           {totalUnread > 0 && (
             <span className={styles.unreadBadge}>{totalUnread} new {totalUnread === 1 ? 'message' : 'messages'}</span>
@@ -80,6 +81,7 @@ export default function ChildDashboard() {
 
       <div className={styles.childLayoutWithChat}>
         <div className={styles.childCards}>
+          <div className={styles.childSectionName}>{child.firstName} {child.lastName}</div>
           <BalanceCard userId={child.id} balance={balance} name={`${child.firstName} ${child.lastName}`} />
           <LoanPanel userId={child.id} isParent={isParentViewing} onAction={refreshBalance} />
           <InvestPanel userId={child.id} isParent={isParentViewing} onAction={refreshBalance} />

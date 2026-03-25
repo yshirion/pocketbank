@@ -162,6 +162,18 @@
 
 ---
 
+## Step 15 — Header Names + Child Section Name + Cards Centered
+**What:** Added logged-in user's name to header center on both pages; added child's name above the cards column; centered cards on desktop; centered "Messages" title.
+**Why:** Headers showed no user identity. Cards were left-aligned on wide screens.
+
+**Changes:**
+- `Dashboard.module.css` — added `.headerName` (absolutely centered in header); added `.childSectionName`; `.childCards` max-width 480px; `justify-content: center` on desktop layout
+- `ChildDashboard.tsx` — added `headerName` span + `childSectionName` div above cards
+- `ParentDashboard.tsx` — replaced family subtitle with `headerName`
+- `MessagingHub.module.css` — `text-align: center` on `.chatTitle`
+
+---
+
 ## Step 14 — Remove Contacts Sidebar from MessagingHub
 **What:** Removed the contacts list panel from MessagingHub; chat is now full-width with only a "Messages" title.
 **Why:** The contacts panel was redundant — in this app's context (parent viewing one child, or child with one parent) only one contact exists. The name header above the chat was also removed.

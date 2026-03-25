@@ -65,7 +65,7 @@ export default function ParentDashboard() {
     <div className={styles.page}>
       <header className={styles.header}>
         <span className={styles.logo}>PocketBank</span>
-        <span className={styles.subtitle}>Family: {family?.name} (ID: {user?.familyId})</span>
+        <span className={styles.headerName}>{user?.firstName} {user?.lastName}</span>
         <button className={styles.logoutBtn} onClick={handleLogout}>Logout</button>
       </header>
 
