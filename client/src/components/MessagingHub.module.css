@@ -78,22 +78,24 @@
   overflow: hidden;
 }
 
-.chatHeader {
-  padding: 0.75rem 1rem;
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: #2d3748;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f7fafc;
-}
-
 .messages {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  background: #edf2f7;
+}
+
+.dateSeparator {
+  align-self: center;
+  font-size: 0.72rem;
+  color: #718096;
+  background: #e2e8f0;
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  margin: 0.4rem 0;
 }
 
 /* My messages: left */

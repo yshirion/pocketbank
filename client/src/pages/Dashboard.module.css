@@ -336,7 +336,7 @@
   .childLayoutWithChat {
     display: flex;
     gap: 1.25rem;
-    max-width: 1100px;
+    max-width: 880px;
     margin: 0 auto;
     padding: 1.25rem;
     align-items: flex-start;

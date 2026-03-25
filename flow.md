@@ -162,6 +162,18 @@
 
 ---
 
+## Step 13 — Messaging Polish + Layout Fixes
+**What:** Removed chat contact-name header; added chat background and date separators in Israel time; removed "Children" title on parent screen; narrowed desktop layout.
+**Why:** The contact name header was redundant (already visible in the contacts list). Chat needed visual separation. Times were showing in wrong timezone.
+
+**Changes:**
+- `MessagingHub.tsx` — removed `chatHeader`; date separators per day (he-IL / Asia/Jerusalem); time uses Israel timezone
+- `MessagingHub.module.css` — removed `.chatHeader`; added `background: #edf2f7` to `.messages`; added `.dateSeparator`
+- `ParentDashboard.tsx` — removed "Children" `<h2>`
+- `Dashboard.module.css` — `childLayoutWithChat` max-width reduced from `1100px` to `880px`
+
+---
+
 ## Step 12 — Center Child Name + Local Network Access
 **What:** Centered the child's name in the parent-screen child cards; exposed Vite dev server on the local network.
 **Why:** Name was left-aligned with balance on the right. Network access allows testing on a phone browser (same Wi-Fi).

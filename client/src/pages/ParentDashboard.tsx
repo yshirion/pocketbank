@@ -71,8 +71,7 @@ export default function ParentDashboard() {
 
       <main className={styles.main}>
         <div className={styles.card}>
-          <h2 className={styles.sectionTitle}>Children</h2>
-          {children.length === 0 && <p className={styles.empty}>No children yet. Share your Family ID with them.</p>}
+{children.length === 0 && <p className={styles.empty}>No children yet. Share your Family ID with them.</p>}
           {children.map((child) => (
             <div key={child.id} className={styles.childCard}>
               <div className={styles.childCardNav} onClick={() => viewChild(child)}>

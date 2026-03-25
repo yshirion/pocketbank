@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, FormEvent } from 'react';
+import { Fragment, useEffect, useState, useRef, FormEvent } from 'react';
 import {
   getFamilyChildren, getFamilyParents,
   getConversation, getUnreadCounts,
@@ -19,6 +19,25 @@ interface Message {
   content: string;
   isRead: boolean;
   createdAt: string;
+}
+
+const IL_LOCALE = 'he-IL';
+const IL_TZ = 'Asia/Jerusalem';
+
+function msgDay(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString(IL_LOCALE, {
+    timeZone: IL_TZ,
+    day: 'numeric',
+    month: 'long',
+  });
+}
+
+function msgTime(dateStr: string): string {
+  return new Date(dateStr).toLocaleTimeString(IL_LOCALE, {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: IL_TZ,
+  });
 }
 
 export default function MessagingHub({
@@ -112,29 +131,31 @@ export default function MessagingHub({
       <div className={styles.chat}>
         {selectedContact ? (
           <>
-            <div className={styles.chatHeader}>
-              {selectedContact.firstName} {selectedContact.lastName}
-            </div>
             <div className={styles.messages}>
               {conversation.length === 0 && (
                 <p className={styles.empty}>No messages yet. Say hello!</p>
               )}
-              {conversation.map((m) => {
+              {conversation.map((m, i) => {
                 const isMine = m.senderId === userId;
                 const isUnread = !isMine && !m.isRead;
+                const day = msgDay(m.createdAt);
+                const prevDay = i > 0 ? msgDay(conversation[i - 1].createdAt) : null;
                 return (
-                  <div key={m.id} className={isMine ? styles.rowMine : styles.rowTheirs}>
-                    <div className={[
-                      styles.bubble,
-                      isMine ? styles.bubbleMine : styles.bubbleTheirs,
-                      isUnread ? styles.unread : '',
-                    ].join(' ')}>
-                      <span className={styles.bubbleText}>{m.content}</span>
-                      <span className={styles.bubbleTime}>
-                        {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                  <Fragment key={m.id}>
+                    {day !== prevDay && (
+                      <div className={styles.dateSeparator}>{day}</div>
+                    )}
+                    <div className={isMine ? styles.rowMine : styles.rowTheirs}>
+                      <div className={[
+                        styles.bubble,
+                        isMine ? styles.bubbleMine : styles.bubbleTheirs,
+                        isUnread ? styles.unread : '',
+                      ].join(' ')}>
+                        <span className={styles.bubbleText}>{m.content}</span>
+                        <span className={styles.bubbleTime}>{msgTime(m.createdAt)}</span>
+                      </div>
                     </div>
-                  </div>
+                  </Fragment>
                 );
               })}
               <div ref={bottomRef} />
