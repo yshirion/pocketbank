@@ -88,20 +88,20 @@ export default function InvestPanel({ userId, isParent, onAction }: Props) {
                 onChange={(e) => setAmount(e.target.value)}
                 required
               />
-              <div className={styles.toggle}>
+              <div className={styles.termToggle}>
                 <button
                   type="button"
-                  className={!longTerm ? styles.activePos : styles.btn}
+                  className={!longTerm ? styles.termOptionActive : styles.termOption}
                   onClick={() => setLongTerm(false)}
                 >
-                  Short (1 mo)
+                  Short · 1 mo
                 </button>
                 <button
                   type="button"
-                  className={longTerm ? styles.activePos : styles.btn}
+                  className={longTerm ? styles.termOptionActive : styles.termOption}
                   onClick={() => setLongTerm(true)}
                 >
-                  Long (6 mo)
+                  Long · 6 mo
                 </button>
               </div>
               <button className={styles.btn} type="submit">Invest</button>

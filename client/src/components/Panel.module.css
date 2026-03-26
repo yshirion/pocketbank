@@ -122,6 +122,42 @@
   cursor: pointer;
 }
 
+.termToggle {
+  display: flex;
+  background: #e2e8f0;
+  border-radius: 8px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.termOption {
+  flex: 1;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  border: none;
+  background: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #718096;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.termOptionActive {
+  flex: 1;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  border: none;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #2b6cb0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
 .error {
   color: #e53e3e;
   font-size: 0.85rem;
