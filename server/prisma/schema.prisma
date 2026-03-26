@@ -10,9 +10,9 @@ datasource db {
 model Family {
   id                  Int    @id @default(autoincrement())
   name                String
-  loanInterest        Float  @default(0.1)
-  investLongInterest  Float  @default(0.1)
-  investShortInterest Float  @default(0.1)
+  loanInterest        Float  @default(1)
+  investLongInterest  Float  @default(2)
+  investShortInterest Float  @default(1)
   users               User[]
 }
 

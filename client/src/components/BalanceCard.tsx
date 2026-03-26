@@ -13,10 +13,9 @@ interface Action {
 interface Props {
   userId: number;
   balance: number;
-  name: string;
 }
 
-export default function BalanceCard({ userId, balance, name }: Props) {
+export default function BalanceCard({ userId, balance }: Props) {
   const [open, setOpen] = useState(false);
   const [actions, setActions] = useState<Action[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -39,7 +38,6 @@ export default function BalanceCard({ userId, balance, name }: Props) {
   return (
     <div className={styles.card}>
       <button className={styles.header} onClick={() => setOpen((o) => !o)}>
-        <p className={styles.name}>{name}</p>
         <p className={styles.label}>Balance</p>
         <p className={styles.amount}>₪{balance.toFixed(2)}</p>
         <span className={open ? styles.chevronOpen : styles.chevron}>▼</span>

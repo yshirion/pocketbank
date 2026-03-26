@@ -82,7 +82,7 @@ export default function ChildDashboard() {
       <div className={styles.childLayoutWithChat}>
         <div className={styles.childCards}>
           <div className={styles.childSectionName}>{child.firstName} {child.lastName}</div>
-          <BalanceCard userId={child.id} balance={balance} name={`${child.firstName} ${child.lastName}`} />
+          <BalanceCard userId={child.id} balance={balance} />
           <LoanPanel userId={child.id} isParent={isParentViewing} onAction={refreshBalance} />
           <InvestPanel userId={child.id} isParent={isParentViewing} onAction={refreshBalance} />
         </div>

@@ -1,5 +1,20 @@
 # PocketBank — Flow Log
 
+## Step 16 — Investment Lock Period + Interest Defaults
+**What:** Replaced manual end-date picker with Short/Long toggle; server computes lock period (1 or 6 months). Release button disabled until maturity. Updated default interest rates to 1%/1%/2%. Removed name from BalanceCard header.
+**Why:** Manual date entry was error-prone. Lock periods enforce the savings discipline. Defaults of 0.1% were unrealistically low.
+
+**Changes:**
+- `BalanceCard.tsx` — removed `name` prop and display; `ChildDashboard.tsx` updated accordingly
+- `InvestPanel.tsx` — Short/Long toggle buttons replace date input; Release button only shows when `now ≥ end`; locked investments show "from [date]"
+- `invest.controller.ts` — `createInvest` computes `end` from `longTerm` (1 or 6 months); `withdrawInvests` rejects if not matured
+- `api.ts` — removed `end` from `createInvest` signature
+- `schema.prisma` — defaults: `loanInterest=1`, `investShortInterest=1`, `investLongInterest=2`
+- Existing Shirion family updated in DB via SQL
+- Client rebuilt
+
+---
+
 ## Step 1 — Project Initialization
 **What:** Created project structure for PocketBank web app.
 **Why:** Migrating EconomiKids from Android + Spring Boot to a web app (Node.js + React + TypeScript) that runs on a Raspberry Pi. Chose SQLite + Prisma for zero-overhead DB on Pi. Express serves React build as static files — single process. Port 8080.

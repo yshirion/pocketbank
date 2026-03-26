@@ -33,11 +33,10 @@ export async function getInvests(req: AuthRequest, res: Response): Promise<void>
 }
 
 export async function createInvest(req: AuthRequest, res: Response): Promise<void> {
-  const { userId, amount, longTerm, end } = req.body as {
+  const { userId, amount, longTerm } = req.body as {
     userId: number;
     amount: number;
     longTerm: boolean;
-    end: string;
   };
 
   const user = await prisma.user.findUnique({ where: { id: userId }, include: { family: true } });
@@ -50,11 +49,14 @@ export async function createInvest(req: AuthRequest, res: Response): Promise<voi
 
   const interest = longTerm ? user.family.investLongInterest : user.family.investShortInterest;
 
+  const end = new Date();
+  end.setMonth(end.getMonth() + (longTerm ? 6 : 1));
+
   await prisma.$transaction([
     prisma.action.create({ data: { userId, positive: false, type: 'invest', amount } }),
     prisma.user.update({ where: { id: userId }, data: { balance: { decrement: amount } } }),
     prisma.invest.create({
-      data: { userId, amount, currentAmount: amount, interest, longTerm, end: new Date(end) },
+      data: { userId, amount, currentAmount: amount, interest, longTerm, end },
     }),
   ]);
 
@@ -65,7 +67,12 @@ export async function withdrawInvests(req: AuthRequest, res: Response): Promise<
   const investIds = (req.body as { ids: number[] }).ids;
   const invests = await prisma.invest.findMany({ where: { id: { in: investIds } } });
 
+  const now = new Date();
   for (const invest of invests) {
+    if (now < invest.end) {
+      res.status(400).json({ error: 'Investment has not matured yet' });
+      return;
+    }
     await prisma.$transaction([
       prisma.invest.delete({ where: { id: invest.id } }),
       prisma.action.create({ data: { userId: invest.userId, positive: true, type: 'return invest', amount: invest.currentAmount } }),

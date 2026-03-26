@@ -63,7 +63,6 @@ export const createInvest = (data: {
   userId: number;
   amount: number;
   longTerm: boolean;
-  end: string;
 }) => api.post('/invest', data);
 export const withdrawInvests = (ids: number[]) =>
   api.delete('/invest', { data: { ids } });
