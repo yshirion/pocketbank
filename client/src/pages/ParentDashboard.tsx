@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth, User } from '../context/AuthContext';
 import { getFamilyChildren, getFamily, updateInterests, logout, createAction } from '../services/api';
 import styles from './Dashboard.module.css';
+import logoImg from '../assets/logo.png';
 
 interface Family {
   id: number;
@@ -64,7 +65,10 @@ export default function ParentDashboard() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <span className={styles.logo}>PocketBank</span>
+        <div className={styles.logoArea}>
+          <img src={logoImg} alt="" className={styles.logoImg} />
+          <span className={styles.logoText}>PocketBank</span>
+        </div>
         <span className={styles.headerName}>{user?.firstName} {user?.lastName}</span>
         <button className={styles.logoutBtn} onClick={handleLogout}>Logout</button>
       </header>
