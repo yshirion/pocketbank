@@ -36,9 +36,13 @@
 }
 
 .logoImg {
-  height: 52px;
-  width: 52px;
+  height: 48px;
+  width: 48px;
   object-fit: contain;
+  background: white;
+  border-radius: 12px;
+  padding: 4px;
+  border: 2px solid rgba(0,0,0,0.15);
 }
 
 .logoText {
