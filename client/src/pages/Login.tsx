@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../services/api';
 import { useAuth, User } from '../context/AuthContext';
 import styles from './Auth.module.css';
+import logoImg from '../assets/logo.png';
 
 export default function Login() {
   const { setUser } = useAuth();
@@ -27,6 +28,7 @@ export default function Login() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
+        <img src={logoImg} alt="PocketBank" className={styles.logoImg} />
         <h1 className={styles.title}>PocketBank</h1>
         <form onSubmit={handleSubmit} className={styles.form}>
           <input
