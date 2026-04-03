@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth, User } from '../context/AuthContext';
-import { logout, getMe, getFamilyChildren, promoteToParent, deleteUser } from '../services/api';
+import { logout, getMe, getFamilyChildren, deleteUser } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import BalanceCard from '../components/BalanceCard';
 import LoanPanel from '../components/LoanPanel';
@@ -50,13 +50,6 @@ export default function ChildDashboard() {
     navigate('/parent');
   }
 
-  async function handlePromote() {
-    if (!confirm(`Promote ${child.firstName} to parent? All their balance, loans, and investments will be deleted.`)) return;
-    await promoteToParent(child.id);
-    setViewingChild(null);
-    navigate('/parent');
-  }
-
   return (
     <div className={styles.page}>
       <header className={styles.header}>
@@ -64,7 +57,7 @@ export default function ChildDashboard() {
           <img src={logoImg} alt="" className={styles.logoImg} />
           <span className={styles.logoText}>PocketBank</span>
         </div>
-        <span className={styles.headerName}>{user?.firstName} {user?.lastName}</span>
+        <span className={styles.headerName}>Hi, {user?.firstName} {user?.lastName} (Family ID: {user?.familyId})</span>
         <div className={styles.headerActions}>
           {totalUnread > 0 && (
             <span className={styles.unreadBadge}>{totalUnread} new {totalUnread === 1 ? 'message' : 'messages'}</span>
@@ -79,7 +72,6 @@ export default function ChildDashboard() {
       {isParentViewing && (
         <div className={styles.parentActionBar}>
           <button className={styles.dangerBtn} onClick={handleRemove}>Remove Child</button>
-          <button className={styles.warnBtn} onClick={handlePromote}>Make Parent</button>
         </div>
       )}
 
@@ -92,7 +84,7 @@ export default function ChildDashboard() {
         </div>
         <div className={styles.childSidebar}>
           {isParentViewing
-            ? <MessagingHub userId={user!.id} familyId={user!.familyId} isParent={true} onUnreadChange={setTotalUnread} />
+            ? <MessagingHub userId={user!.id} familyId={user!.familyId} isParent={true} preSelectedId={child.id} onUnreadChange={setTotalUnread} />
             : <MessagingHub userId={child.id} familyId={child.familyId} isParent={false} onUnreadChange={setTotalUnread} />
           }
         </div>

@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState, useRef, FormEvent } from 'react';
 import {
   getFamilyChildren, getFamilyParents,
-  getConversation, getUnreadCounts,
+  getConversation, getChildThread, getUnreadCounts,
   sendMessage as sendMsg, markRead,
 } from '../services/api';
 import styles from './MessagingHub.module.css';
@@ -44,15 +44,17 @@ export default function MessagingHub({
   userId,
   familyId,
   isParent,
+  preSelectedId,
   onUnreadChange,
 }: {
   userId: number;
   familyId: number;
   isParent: boolean;
+  preSelectedId?: number;
   onUnreadChange?: (count: number) => void;
 }) {
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(preSelectedId ?? null);
   const [conversation, setConversation] = useState<Message[]>([]);
   const [draft, setDraft] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -65,12 +67,26 @@ export default function MessagingHub({
   }
 
   async function loadConversation(otherId: number) {
-    const res = await getConversation(otherId);
+    // If parent is viewing a specific child, load the full child thread (all parents visible)
+    const res = preSelectedId
+      ? await getChildThread(otherId)
+      : await getConversation(otherId);
     const msgs = res.data as Message[];
     setConversation(msgs);
     const unreadIds = msgs
-      .filter((m) => m.senderId === otherId && !m.isRead)
+      .filter((m) => m.senderId !== userId && !m.isRead)
       .map((m) => m.id);
+    if (unreadIds.length > 0) {
+      await markRead(unreadIds);
+      await loadUnread();
+    }
+  }
+
+  async function loadChildThread() {
+    const res = await getChildThread(userId);
+    const msgs = res.data as Message[];
+    setConversation(msgs);
+    const unreadIds = msgs.filter((m) => m.senderId !== userId && !m.isRead).map((m) => m.id);
     if (unreadIds.length > 0) {
       await markRead(unreadIds);
       await loadUnread();
@@ -82,13 +98,17 @@ export default function MessagingHub({
     fetcher(familyId).then((res) => {
       const list = res.data as Contact[];
       setContacts(list);
-      if (list.length > 0) setSelectedId(list[0].id);
+      if (isParent) {
+        if (!preSelectedId && list.length > 0) setSelectedId(list[0].id);
+      } else {
+        loadChildThread();
+      }
     });
     loadUnread();
   }, [userId, familyId]);
 
   useEffect(() => {
-    if (selectedId !== null) loadConversation(selectedId);
+    if (isParent && selectedId !== null) loadConversation(selectedId);
   }, [selectedId]);
 
   useEffect(() => {
@@ -97,10 +117,18 @@ export default function MessagingHub({
 
   async function handleSend(e: FormEvent) {
     e.preventDefault();
-    if (!selectedId || !draft.trim()) return;
-    await sendMsg({ receiverId: selectedId, content: draft.trim() });
-    setDraft('');
-    await loadConversation(selectedId);
+    if (!draft.trim()) return;
+    if (isParent) {
+      if (!selectedId) return;
+      await sendMsg({ receiverId: selectedId, content: draft.trim() });
+      setDraft('');
+      await loadConversation(selectedId);
+    } else {
+      if (contacts.length === 0) return;
+      await sendMsg({ receiverId: contacts[0].id, content: draft.trim() });
+      setDraft('');
+      await loadChildThread();
+    }
   }
 
   const selectedContact = contacts.find((c) => c.id === selectedId);
@@ -109,14 +137,16 @@ export default function MessagingHub({
     <div className={styles.hub}>
       <div className={styles.chat}>
         <div className={styles.chatTitle}>Messages</div>
-        {selectedContact ? (
+        {(selectedContact || !isParent) ? (
           <>
             <div className={styles.messages}>
               {conversation.length === 0 && (
                 <p className={styles.empty}>No messages yet. Say hello!</p>
               )}
               {conversation.map((m, i) => {
-                const isMine = m.senderId === userId;
+                const isMine = (isParent && preSelectedId)
+                  ? m.senderId !== preSelectedId   // parent view: anything not from the child = "mine"
+                  : m.senderId === userId;
                 const isUnread = !isMine && !m.isRead;
                 const day = msgDay(m.createdAt);
                 const prevDay = i > 0 ? msgDay(conversation[i - 1].createdAt) : null;
@@ -131,6 +161,9 @@ export default function MessagingHub({
                         isMine ? styles.bubbleMine : styles.bubbleTheirs,
                         isUnread ? styles.unread : '',
                       ].join(' ')}>
+                        {!isMine && !isParent && (
+                          <span className={styles.senderName}>{m.senderName}</span>
+                        )}
                         <span className={styles.bubbleText}>{m.content}</span>
                         <span className={styles.bubbleTime}>{msgTime(m.createdAt)}</span>
                       </div>

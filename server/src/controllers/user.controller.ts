@@ -14,9 +14,14 @@ export async function getMe(req: AuthRequest, res: Response): Promise<void> {
 export async function getFamilyChildren(req: AuthRequest, res: Response): Promise<void> {
   const children = await prisma.user.findMany({
     where: { familyId: Number(req.params.familyId), isParent: false },
-    select: { id: true, firstName: true, lastName: true, username: true, balance: true, familyId: true, isParent: true },
+    select: { id: true, firstName: true, lastName: true, username: true, balance: true, familyId: true, isParent: true, isConfirmed: true },
   });
   res.json(children);
+}
+
+export async function confirmChild(req: AuthRequest, res: Response): Promise<void> {
+  await prisma.user.update({ where: { id: Number(req.params.id) }, data: { isConfirmed: true } });
+  res.json({ message: 'Child confirmed' });
 }
 
 export async function getFamilyParents(req: AuthRequest, res: Response): Promise<void> {

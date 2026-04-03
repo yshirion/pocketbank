@@ -20,8 +20,13 @@ export default function Login() {
       const user = res.data as User;
       setUser(user);
       navigate(user.isParent ? '/parent' : '/child');
-    } catch {
-      setError('Invalid username or password.');
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number; data?: { error?: string } } })?.response;
+      if (status?.data?.error === 'pending_approval') {
+        setError('Your account is waiting for parent approval.');
+      } else {
+        setError('Invalid username or password.');
+      }
     }
   }
 

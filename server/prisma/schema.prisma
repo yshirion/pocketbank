@@ -23,8 +23,9 @@ model User {
   lastName  String
   username  String  @unique
   password  String
-  isParent  Boolean @default(false)
-  balance   Float   @default(0)
+  isParent    Boolean @default(false)
+  isConfirmed Boolean @default(true)
+  balance     Float   @default(0)
 
   family    Family    @relation(fields: [familyId], references: [id])
   actions   Action[]

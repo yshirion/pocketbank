@@ -39,9 +39,7 @@
   height: 48px;
   width: 48px;
   object-fit: cover;
-  background: white;
   border-radius: 12px;
-  border: 2px solid rgba(0,0,0,0.2);
 }
 
 .logoText {
@@ -260,6 +258,52 @@
   background: #fed7d7;
   color: #9b2c2c;
   border: 1px solid #fc8181;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ── Pending child cards ── */
+.pendingCard {
+  background: #fffbeb;
+  border: 1px dashed #f6ad55;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.pendingInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.pendingName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.pendingLabel {
+  font-size: 0.78rem;
+  color: #c05621;
+}
+
+.pendingActions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.confirmBtn {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: #c6f6d5;
+  color: #276749;
+  border: 1px solid #9ae6b4;
   border-radius: 8px;
   cursor: pointer;
 }

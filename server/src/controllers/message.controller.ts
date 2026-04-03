@@ -61,6 +61,25 @@ export async function getConversation(req: AuthRequest, res: Response): Promise<
   res.json(messages);
 }
 
+export async function getChildThread(req: AuthRequest, res: Response): Promise<void> {
+  const childId = Number(req.params.childId);
+
+  const child = await prisma.user.findUnique({ where: { id: childId } });
+  if (!child) { res.status(404).json({ error: 'Not found' }); return; }
+
+  const requester = await prisma.user.findUnique({ where: { id: req.userId } });
+  if (!requester || requester.familyId !== child.familyId) {
+    res.status(403).json({ error: 'Forbidden' }); return;
+  }
+
+  const messages = await prisma.message.findMany({
+    where: { OR: [{ senderId: childId }, { receiverId: childId }] },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  res.json(messages);
+}
+
 export async function getUnreadCounts(req: AuthRequest, res: Response): Promise<void> {
   const myId = req.userId!;
 

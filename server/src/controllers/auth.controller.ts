@@ -26,6 +26,11 @@ export async function login(req: Request, res: Response): Promise<void> {
     return;
   }
 
+  if (!user.isConfirmed) {
+    res.status(403).json({ error: 'pending_approval' });
+    return;
+  }
+
   const token = jwt.sign(
     { userId: user.id, isParent: user.isParent },
     process.env.JWT_SECRET as string,
@@ -117,6 +122,7 @@ export async function registerChild(req: Request, res: Response): Promise<void> 
       username,
       password: hashed,
       isParent: false,
+      isConfirmed: false,
       familyId,
     },
   });

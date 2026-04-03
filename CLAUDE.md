@@ -82,3 +82,9 @@ All 6 entities from EconomiKids must be carried over:
 - **Message** — sent between family members
 
 Parent permissions: view children, delete them, promote to parent, delete child's loans/investments.
+
+---
+
+## Security Review Rule
+
+When walking through code with the user, flag any security issue encountered — treat the app as a standard production web app (not enterprise-scale, but not "it's just a home app" either). Flag the issue inline during the explanation, clearly marked as a security note.

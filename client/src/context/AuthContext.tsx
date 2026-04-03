@@ -10,6 +10,7 @@ export interface User {
   lastName: string;
   username: string;
   isParent: boolean;
+  isConfirmed: boolean;
   balance: number;
 }
 
@@ -23,15 +24,27 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const TAB_KEY = 'pb_tab_auth';
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUserState] = useState<User | null>(null);
   const [viewingChild, setViewingChild] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  function setUser(u: User | null) {
+    if (u) sessionStorage.setItem(TAB_KEY, '1');
+    else sessionStorage.removeItem(TAB_KEY);
+    setUserState(u);
+  }
+
   useEffect(() => {
+    if (!sessionStorage.getItem(TAB_KEY)) {
+      setLoading(false);
+      return;
+    }
     getMe()
-      .then((res) => setUser(res.data as User))
-      .catch(() => setUser(null))
+      .then((res) => setUserState(res.data as User))
+      .catch(() => { setUserState(null); sessionStorage.removeItem(TAB_KEY); })
       .finally(() => setLoading(false));
   }, []);
 

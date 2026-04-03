@@ -84,6 +84,13 @@
   box-shadow: 0 0 0 1px #f6e05e44;
 }
 
+.senderName {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #276749;
+  margin-bottom: 1px;
+}
+
 .bubbleText {
   font-size: 0.9rem;
   color: #2d3748;

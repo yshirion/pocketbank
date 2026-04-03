@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, User } from '../context/AuthContext';
-import { getFamilyChildren, getFamily, updateInterests, logout, createAction } from '../services/api';
+import { getFamilyChildren, getFamily, updateInterests, logout, createAction, confirmChild, promoteToParent, deleteUser } from '../services/api';
 import styles from './Dashboard.module.css';
 import logoImg from '../assets/logo.png';
 
@@ -56,6 +56,24 @@ export default function ParentDashboard() {
     await load();
   }
 
+  async function handleConfirm(childId: number) {
+    await confirmChild(childId);
+    await load();
+  }
+
+  async function handleDeny(child: User) {
+    if (!confirm(`Deny ${child.firstName}? This will delete their account.`)) return;
+    await deleteUser(child.id);
+    await load();
+  }
+
+  async function handlePromotePending(child: User) {
+    if (!confirm(`Make ${child.firstName} a parent? Their account will be confirmed and promoted.`)) return;
+    await confirmChild(child.id);
+    await promoteToParent(child.id);
+    await load();
+  }
+
   async function handleLogout() {
     await logout();
     setUser(null);
@@ -69,14 +87,29 @@ export default function ParentDashboard() {
           <img src={logoImg} alt="" className={styles.logoImg} />
           <span className={styles.logoText}>PocketBank</span>
         </div>
-        <span className={styles.headerName}>{user?.firstName} {user?.lastName}</span>
+        <span className={styles.headerName}>Hi, {user?.firstName} {user?.lastName} (Family ID: {user?.familyId})</span>
         <button className={styles.logoutBtn} onClick={handleLogout}>Logout</button>
       </header>
 
       <main className={styles.main}>
         <div className={styles.card}>
-{children.length === 0 && <p className={styles.empty}>No children yet. Share your Family ID with them.</p>}
-          {children.map((child) => (
+          {children.filter(c => !c.isConfirmed).map((child) => (
+            <div key={child.id} className={styles.pendingCard}>
+              <div className={styles.pendingInfo}>
+                <span className={styles.pendingName}>{child.firstName} {child.lastName}</span>
+                <span className={styles.pendingLabel}>Waiting for approval</span>
+              </div>
+              <div className={styles.pendingActions}>
+                <button className={styles.confirmBtn} onClick={() => handleConfirm(child.id)}>Confirm</button>
+                <button className={styles.deleteBtn} onClick={() => handleDeny(child)}>Deny</button>
+                <button className={styles.promoteBtn} onClick={() => handlePromotePending(child)}>Make Parent</button>
+              </div>
+            </div>
+          ))}
+          {children.filter(c => c.isConfirmed).length === 0 && children.filter(c => !c.isConfirmed).length === 0 && (
+            <p className={styles.empty}>No children yet. Share your Family ID with them.</p>
+          )}
+          {children.filter(c => c.isConfirmed).map((child) => (
             <div key={child.id} className={styles.childCard}>
               <div className={styles.childCardNav} onClick={() => viewChild(child)}>
                 <span className={styles.childCardName}>{child.firstName} {child.lastName}</span>

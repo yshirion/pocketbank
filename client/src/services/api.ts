@@ -32,6 +32,7 @@ export const getFamilyChildren = (familyId: number) =>
   api.get(`/user/family/${familyId}/children`);
 export const getFamilyParents = (familyId: number) =>
   api.get(`/user/family/${familyId}/parents`);
+export const confirmChild = (id: number) => api.patch(`/user/${id}/confirm`);
 export const promoteToParent = (id: number) => api.patch(`/user/${id}/promote`);
 export const deleteUser = (id: number) => api.delete(`/user/${id}`);
 
@@ -71,6 +72,7 @@ export const withdrawInvests = (ids: number[]) =>
 export const getInbox = (userId: number) => api.get(`/message/inbox/${userId}`);
 export const getSent = (userId: number) => api.get(`/message/sent/${userId}`);
 export const getConversation = (otherUserId: number) => api.get(`/message/conversation/${otherUserId}`);
+export const getChildThread = (childId: number) => api.get(`/message/child-thread/${childId}`);
 export const getUnreadCounts = () => api.get('/message/unread-counts');
 export const sendMessage = (data: { receiverId: number; content: string }) =>
   api.post('/message', data);
