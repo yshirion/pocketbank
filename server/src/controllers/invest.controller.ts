@@ -12,8 +12,17 @@ function compound(principal: number, ratePercent: number, months: number): numbe
   return principal * Math.pow(1 + ratePercent / 100, months);
 }
 
+async function sameFamily(requesterId: number, targetUserId: number): Promise<boolean> {
+  const [me, target] = await Promise.all([
+    prisma.user.findUnique({ where: { id: requesterId }, select: { familyId: true } }),
+    prisma.user.findUnique({ where: { id: targetUserId }, select: { familyId: true } }),
+  ]);
+  return !!me && !!target && me.familyId === target.familyId;
+}
+
 export async function getInvests(req: AuthRequest, res: Response): Promise<void> {
   const userId = Number(req.params.userId);
+  if (!await sameFamily(req.userId!, userId)) { res.status(403).json({ error: 'Forbidden' }); return; }
   const invests = await prisma.invest.findMany({ where: { userId } });
   const now = new Date();
 
@@ -41,6 +50,7 @@ export async function createInvest(req: AuthRequest, res: Response): Promise<voi
 
   const user = await prisma.user.findUnique({ where: { id: userId }, include: { family: true } });
   if (!user) { res.status(404).json({ error: 'User not found' }); return; }
+  if (!await sameFamily(req.userId!, userId)) { res.status(403).json({ error: 'Forbidden' }); return; }
 
   if (user.balance - amount < 0) {
     res.status(400).json({ error: 'Insufficient balance' });
@@ -69,6 +79,7 @@ export async function withdrawInvests(req: AuthRequest, res: Response): Promise<
 
   const now = new Date();
   for (const invest of invests) {
+    if (!await sameFamily(req.userId!, invest.userId)) { res.status(403).json({ error: 'Forbidden' }); return; }
     if (now < invest.end) {
       res.status(400).json({ error: 'Investment has not matured yet' });
       return;

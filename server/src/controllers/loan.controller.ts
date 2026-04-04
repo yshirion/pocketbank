@@ -12,8 +12,17 @@ function compound(principal: number, ratePercent: number, months: number): numbe
   return principal * Math.pow(1 + ratePercent / 100, months);
 }
 
+async function sameFamily(requesterId: number, targetUserId: number): Promise<boolean> {
+  const [me, target] = await Promise.all([
+    prisma.user.findUnique({ where: { id: requesterId }, select: { familyId: true } }),
+    prisma.user.findUnique({ where: { id: targetUserId }, select: { familyId: true } }),
+  ]);
+  return !!me && !!target && me.familyId === target.familyId;
+}
+
 export async function getLoans(req: AuthRequest, res: Response): Promise<void> {
   const userId = Number(req.params.userId);
+  if (!await sameFamily(req.userId!, userId)) { res.status(403).json({ error: 'Forbidden' }); return; }
   const loans = await prisma.loan.findMany({ where: { userId } });
   const now = new Date();
 
@@ -37,6 +46,7 @@ export async function createLoan(req: AuthRequest, res: Response): Promise<void>
 
   const user = await prisma.user.findUnique({ where: { id: userId }, include: { family: true } });
   if (!user) { res.status(404).json({ error: 'User not found' }); return; }
+  if (!await sameFamily(req.userId!, userId)) { res.status(403).json({ error: 'Forbidden' }); return; }
 
   await prisma.$transaction([
     prisma.action.create({ data: { userId, positive: true, type: 'loan', amount } }),
@@ -59,6 +69,7 @@ export async function repayLoans(req: AuthRequest, res: Response): Promise<void>
   const loans = await prisma.loan.findMany({ where: { id: { in: loanIds } } });
 
   for (const loan of loans) {
+    if (!await sameFamily(req.userId!, loan.userId)) { res.status(403).json({ error: 'Forbidden' }); return; }
     const user = await prisma.user.findUnique({ where: { id: loan.userId } });
     if (!user || user.balance - loan.currentAmount < 0) {
       res.status(400).json({ error: `Insufficient balance to repay loan ${loan.id}` });
