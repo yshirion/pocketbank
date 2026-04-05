@@ -1,17 +1,9 @@
 import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/auth';
+import { sameFamily } from '../utils/finance';
 
 const prisma = new PrismaClient();
-
-async function sameFamily( requesterId: number, targetUserId: number ): Promise<boolean>
-{
-  const [me, target] = await Promise.all([
-    prisma.user.findUnique({ where: { id: requesterId }, select: { familyId: true } }),
-    prisma.user.findUnique({ where: { id: targetUserId }, select: { familyId: true } }),
-  ]);
-  return !!me && !!target && me.familyId === target.familyId;
-}
 
 export async function getActions( req: AuthRequest, res: Response ): Promise<void>
 {
