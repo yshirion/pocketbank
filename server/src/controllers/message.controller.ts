@@ -4,27 +4,34 @@ import { AuthRequest } from '../middleware/auth';
 
 const prisma = new PrismaClient();
 
-export async function getInbox(req: AuthRequest, res: Response): Promise<void> {
+export async function getInbox( req: AuthRequest, res: Response ): Promise<void>
+{
   const messages = await prisma.message.findMany({
-    where: { receiverId: Number(req.params.userId) },
+    where: { receiverId: Number( req.params.userId ) },
     orderBy: { createdAt: 'desc' },
   });
-  res.json(messages);
+  res.json( messages );
 }
 
-export async function getSent(req: AuthRequest, res: Response): Promise<void> {
+export async function getSent( req: AuthRequest, res: Response ): Promise<void>
+{
   const messages = await prisma.message.findMany({
-    where: { senderId: Number(req.params.userId) },
+    where: { senderId: Number( req.params.userId ) },
     orderBy: { createdAt: 'desc' },
   });
-  res.json(messages);
+  res.json( messages );
 }
 
-export async function sendMessage(req: AuthRequest, res: Response): Promise<void> {
+export async function sendMessage( req: AuthRequest, res: Response ): Promise<void>
+{
   const { receiverId, content } = req.body as { receiverId: number; content: string };
 
   const sender = await prisma.user.findUnique({ where: { id: req.userId } });
-  if (!sender) { res.status(404).json({ error: 'Sender not found' }); return; }
+  if( !sender )
+  {
+    res.status( 404 ).json({ error: 'Sender not found' });
+    return;
+  }
 
   const message = await prisma.message.create({
     data: {
@@ -35,18 +42,20 @@ export async function sendMessage(req: AuthRequest, res: Response): Promise<void
     },
   });
 
-  res.status(201).json(message);
+  res.status( 201 ).json( message );
 }
 
-export async function markRead(req: AuthRequest, res: Response): Promise<void> {
-  const ids = (req.body as { ids: number[] }).ids;
+export async function markRead( req: AuthRequest, res: Response ): Promise<void>
+{
+  const ids = ( req.body as { ids: number[] } ).ids;
   await prisma.message.updateMany({ where: { id: { in: ids } }, data: { isRead: true } });
   res.json({ message: 'Marked as read' });
 }
 
-export async function getConversation(req: AuthRequest, res: Response): Promise<void> {
+export async function getConversation( req: AuthRequest, res: Response ): Promise<void>
+{
   const myId = req.userId!;
-  const otherId = Number(req.params.otherUserId);
+  const otherId = Number( req.params.otherUserId );
 
   const messages = await prisma.message.findMany({
     where: {
@@ -58,18 +67,25 @@ export async function getConversation(req: AuthRequest, res: Response): Promise<
     orderBy: { createdAt: 'asc' },
   });
 
-  res.json(messages);
+  res.json( messages );
 }
 
-export async function getChildThread(req: AuthRequest, res: Response): Promise<void> {
-  const childId = Number(req.params.childId);
+export async function getChildThread( req: AuthRequest, res: Response ): Promise<void>
+{
+  const childId = Number( req.params.childId );
 
   const child = await prisma.user.findUnique({ where: { id: childId } });
-  if (!child) { res.status(404).json({ error: 'Not found' }); return; }
+  if( !child )
+  {
+    res.status( 404 ).json({ error: 'Not found' });
+    return;
+  }
 
   const requester = await prisma.user.findUnique({ where: { id: req.userId } });
-  if (!requester || requester.familyId !== child.familyId) {
-    res.status(403).json({ error: 'Forbidden' }); return;
+  if( !requester || requester.familyId !== child.familyId )
+  {
+    res.status( 403 ).json({ error: 'Forbidden' });
+    return;
   }
 
   const messages = await prisma.message.findMany({
@@ -77,10 +93,11 @@ export async function getChildThread(req: AuthRequest, res: Response): Promise<v
     orderBy: { createdAt: 'asc' },
   });
 
-  res.json(messages);
+  res.json( messages );
 }
 
-export async function getUnreadCounts(req: AuthRequest, res: Response): Promise<void> {
+export async function getUnreadCounts( req: AuthRequest, res: Response ): Promise<void>
+{
   const myId = req.userId!;
 
   const rows = await prisma.message.groupBy({
@@ -90,7 +107,10 @@ export async function getUnreadCounts(req: AuthRequest, res: Response): Promise<
   });
 
   const counts: Record<number, number> = {};
-  for (const row of rows) counts[row.senderId] = row._count.id;
+  for( const row of rows )
+  {
+    counts[row.senderId] = row._count.id;
+  }
 
-  res.json(counts);
+  res.json( counts );
 }
