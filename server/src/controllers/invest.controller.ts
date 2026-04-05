@@ -78,18 +78,24 @@ export async function withdrawInvests(req: AuthRequest, res: Response): Promise<
   const invests = await prisma.invest.findMany({ where: { id: { in: investIds } } });
 
   const now = new Date();
+
+  // Validate everything before touching the DB
   for (const invest of invests) {
     if (!await sameFamily(req.userId!, invest.userId)) { res.status(403).json({ error: 'Forbidden' }); return; }
     if (now < invest.end) {
       res.status(400).json({ error: 'Investment has not matured yet' });
       return;
     }
-    await prisma.$transaction([
+  }
+
+  // All valid — execute atomically in one transaction
+  await prisma.$transaction(
+    invests.flatMap((invest) => [
       prisma.invest.delete({ where: { id: invest.id } }),
       prisma.action.create({ data: { userId: invest.userId, positive: true, type: 'return invest', amount: invest.currentAmount } }),
       prisma.user.update({ where: { id: invest.userId }, data: { balance: { increment: invest.currentAmount } } }),
-    ]);
-  }
+    ])
+  );
 
   res.json({ message: 'Investments withdrawn' });
 }

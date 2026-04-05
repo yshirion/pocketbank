@@ -22,14 +22,19 @@ async function sameFamily(requesterId: number, targetUserId: number): Promise<bo
 
 export async function getLoans(req: AuthRequest, res: Response): Promise<void> {
   const userId = Number(req.params.userId);
-  if (!await sameFamily(req.userId!, userId)) { res.status(403).json({ error: 'Forbidden' }); return; }
+  if (!await sameFamily(req.userId!, userId)) 
+    { 
+      res.status(403).json({ error: 'Forbidden' }); 
+      return; 
+    }
   const loans = await prisma.loan.findMany({ where: { userId } });
   const now = new Date();
 
   const updated = await Promise.all(
     loans.map(async (loan) => {
       const gap = gapMonths(loan.updatedAt, now);
-      if (gap <= 0) return loan;
+      if (gap <= 0) 
+        return loan;
       const newAmount = compound(loan.currentAmount, loan.interest, gap);
       return prisma.loan.update({
         where: { id: loan.id },
@@ -68,6 +73,7 @@ export async function repayLoans(req: AuthRequest, res: Response): Promise<void>
   const loanIds = (req.body as { ids: number[] }).ids;
   const loans = await prisma.loan.findMany({ where: { id: { in: loanIds } } });
 
+  // Validate everything before touching the DB
   for (const loan of loans) {
     if (!await sameFamily(req.userId!, loan.userId)) { res.status(403).json({ error: 'Forbidden' }); return; }
     const user = await prisma.user.findUnique({ where: { id: loan.userId } });
@@ -75,12 +81,16 @@ export async function repayLoans(req: AuthRequest, res: Response): Promise<void>
       res.status(400).json({ error: `Insufficient balance to repay loan ${loan.id}` });
       return;
     }
-    await prisma.$transaction([
+  }
+
+  // All valid — execute atomically in one transaction
+  await prisma.$transaction(
+    loans.flatMap((loan) => [
       prisma.loan.delete({ where: { id: loan.id } }),
       prisma.action.create({ data: { userId: loan.userId, positive: false, type: 'return loan', amount: loan.currentAmount } }),
       prisma.user.update({ where: { id: loan.userId }, data: { balance: { decrement: loan.currentAmount } } }),
-    ]);
-  }
+    ])
+  );
 
   res.json({ message: 'Loans repaid' });
 }
