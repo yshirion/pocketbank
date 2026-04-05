@@ -6,8 +6,14 @@ const prisma = new PrismaClient();
 
 export async function getInbox( req: AuthRequest, res: Response ): Promise<void>
 {
+  const userId = Number( req.params.userId );
+  if( userId !== req.userId )
+  {
+    res.status( 403 ).json({ error: 'Forbidden' });
+    return;
+  }
   const messages = await prisma.message.findMany({
-    where: { receiverId: Number( req.params.userId ) },
+    where: { receiverId: userId },
     orderBy: { createdAt: 'desc' },
   });
   res.json( messages );
@@ -15,8 +21,14 @@ export async function getInbox( req: AuthRequest, res: Response ): Promise<void>
 
 export async function getSent( req: AuthRequest, res: Response ): Promise<void>
 {
+  const userId = Number( req.params.userId );
+  if( userId !== req.userId )
+  {
+    res.status( 403 ).json({ error: 'Forbidden' });
+    return;
+  }
   const messages = await prisma.message.findMany({
-    where: { senderId: Number( req.params.userId ) },
+    where: { senderId: userId },
     orderBy: { createdAt: 'desc' },
   });
   res.json( messages );
@@ -30,6 +42,13 @@ export async function sendMessage( req: AuthRequest, res: Response ): Promise<vo
   if( !sender )
   {
     res.status( 404 ).json({ error: 'Sender not found' });
+    return;
+  }
+
+  const receiver = await prisma.user.findUnique({ where: { id: receiverId } });
+  if( !receiver || receiver.familyId !== sender.familyId )
+  {
+    res.status( 403 ).json({ error: 'Forbidden' });
     return;
   }
 
