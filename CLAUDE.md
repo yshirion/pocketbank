@@ -88,3 +88,10 @@ Parent permissions: view children, delete them, promote to parent, delete child'
 ## Security Review Rule
 
 When walking through code with the user, flag any security issue encountered — treat the app as a standard production web app (not enterprise-scale, but not "it's just a home app" either). Flag the issue inline during the explanation, clearly marked as a security note.
+
+## Code Quality Review Rule
+
+When walking through code with the user, also flag:
+- Structural issues: duplicated code that should be extracted to a shared file, functions that don't belong in a file
+- Formatting issues: inconsistent spacing, unnecessary blank lines, wrong line breaks
+Flag these inline, clearly marked as a code quality note.

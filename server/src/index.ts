@@ -11,6 +11,7 @@ import actionRoutes from './routes/action';
 import loanRoutes from './routes/loan';
 import investRoutes from './routes/invest';
 import messageRoutes from './routes/message';
+import missionRoutes from './routes/mission';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use('/action', actionRoutes);
 app.use('/loan', loanRoutes);
 app.use('/invest', investRoutes);
 app.use('/message', messageRoutes);
+app.use('/mission', missionRoutes);
 
 app.use(express.static(path.join(__dirname, '../../client/dist')));
 app.get('*', (_req, res) => {

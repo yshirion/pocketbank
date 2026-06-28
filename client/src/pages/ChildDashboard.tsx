@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import BalanceCard from '../components/BalanceCard';
 import LoanPanel from '../components/LoanPanel';
 import InvestPanel from '../components/InvestPanel';
+import MissionPanel from '../components/MissionPanel';
 import MessagingHub from '../components/MessagingHub';
 import styles from './Dashboard.module.css';
 import logoImg from '../assets/logo.png';
@@ -81,6 +82,7 @@ export default function ChildDashboard() {
           <BalanceCard userId={child.id} balance={balance} />
           <LoanPanel userId={child.id} isParent={isParentViewing} onAction={refreshBalance} />
           <InvestPanel userId={child.id} isParent={isParentViewing} onAction={refreshBalance} />
+          <MissionPanel childId={child.id} isParentViewing={isParentViewing} />
         </div>
         <div className={styles.childSidebar}>
           {isParentViewing

@@ -14,6 +14,7 @@ model Family {
   investLongInterest  Float  @default(2)
   investShortInterest Float  @default(1)
   users               User[]
+  missions            Mission[]
 }
 
 model User {
@@ -33,6 +34,9 @@ model User {
   invests   Invest[]
   sentMessages     Message[] @relation("SentMessages")
   receivedMessages Message[] @relation("ReceivedMessages")
+  createdMissions    Mission[]           @relation("CreatedMissions")
+  assignedMissions   Mission[]           @relation("AssignedMissions")
+  missionCompletions MissionCompletion[]
 }
 
 model Action {
@@ -83,4 +87,39 @@ model Message {
 
   sender      User     @relation("SentMessages", fields: [senderId], references: [id])
   receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+}
+
+model Mission {
+  id          Int       @id @default(autoincrement())
+  familyId    Int
+  createdBy   Int
+  assignedTo  Int?
+  title       String
+  description String?
+  reward      Float
+  isRepeat    Boolean   @default(false)
+  repeatEvery Int?
+  repeatUnit  String?
+  expiresAt   DateTime?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  family      Family    @relation(fields: [familyId], references: [id])
+  creator     User      @relation("CreatedMissions",  fields: [createdBy],  references: [id])
+  assignee    User?     @relation("AssignedMissions", fields: [assignedTo], references: [id])
+  completions MissionCompletion[]
+}
+
+model MissionCompletion {
+  id          Int       @id @default(autoincrement())
+  missionId   Int
+  userId      Int
+  completedAt DateTime  @default(now())
+  approvedBy  Int?
+  approvedAt  DateTime?
+  rewardSent  Boolean   @default(false)
+  seenByChild Boolean   @default(false)
+
+  mission     Mission   @relation(fields: [missionId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
 }

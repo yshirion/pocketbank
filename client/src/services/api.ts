@@ -77,3 +77,27 @@ export const getUnreadCounts = () => api.get('/message/unread-counts');
 export const sendMessage = (data: { receiverId: number; content: string }) =>
   api.post('/message', data);
 export const markRead = (ids: number[]) => api.patch('/message/read', { ids });
+
+// --- Mission ---
+export const listMissions     = (childId?: number) =>
+  api.get('/mission', { params: childId ? { childId } : {} });
+export const createMission    = (data: {
+  title: string;
+  description?: string;
+  reward: number;
+  assignedTo?: number;
+  isRepeat: boolean;
+  repeatEvery?: number;
+  repeatUnit?: string;
+  expiresAt?: string;
+}) => api.post('/mission', data);
+export const completeMission  = (missionId: number) =>
+  api.post(`/mission/${missionId}/complete`);
+export const approveMission   = (completionId: number) =>
+  api.post(`/mission/completions/${completionId}/approve`);
+export const deactivateMission = (missionId: number) =>
+  api.patch(`/mission/${missionId}/deactivate`);
+export const getMissionNotifications = () =>
+  api.get('/mission/notifications');
+export const markMissionNotificationsSeen = () =>
+  api.post('/mission/notifications/seen');
